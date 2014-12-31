@@ -45,35 +45,30 @@ class DOAlertAction : NSObject, NSCopying {
 
 class DOAlertController : UIViewController {
     
-    // スタイル
+    // AlertController Style
     var preferredStyle: DOAlertControllerStyle?
     
-    // 背景ビュー
-    var overlayBgColor = UIColor(red:0, green:0, blue:0, alpha:0.7)
+    // Overlay Color
+    var overlayColor = UIColor(red:0, green:0, blue:0, alpha:0.7)
     
-    // アラートビュー
+    // Alert View
     private var alertView = UIView()
-    private let alertViewPadding: CGFloat = 15.0
-    private let alertViewWidth: CGFloat = 270.0
-    var alertViewBgColor = UIColor(red:239/255, green:240/255, blue:242/255, alpha:1)
+    var alertViewBgColor = UIColor(red:239/255, green:240/255, blue:242/255, alpha:1.0)
     
-    // タイトルラベル
+    // Title
     private var titleLabel = UILabel()
-    private let titleLabelHeight: CGFloat = 20.0
     var titleFont = UIFont(name: "HelveticaNeue-Bold", size: 18)
-    var titleTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1)
+    var titleTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
-    // メッセージビュー
+    // Message
     private var messageView = UITextView()
-    private var messageViewHeight: CGFloat = 0.0
+    private var message: String?
     var messageFont = UIFont(name: "HelveticaNeue", size: 15)
-    var messageTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1)
-    var message: String?
+    var messageTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
-    // アラートビュー内のボタン
+    // Buttons
     private var buttons = [UIButton]()
     private var buttonHeight: CGFloat = 44.0
-    private var buttonMargin: CGFloat = 10.0
     var buttonFont = UIFont(name: "HelveticaNeue-Bold", size: 16)
     
     var buttonBgColor: [DOAlertActionStyle : UIColor] = [
@@ -94,7 +89,7 @@ class DOAlertController : UIViewController {
     var textFields: [AnyObject]?
     
     init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
-        super.init()
+        super.init(nibName: nil, bundle: nil)
         
         self.title = title
         self.message = message
@@ -105,33 +100,28 @@ class DOAlertController : UIViewController {
         self.modalTransitionStyle = UIModalTransitionStyle.CoverVertical
         self.modalPresentationStyle = UIModalPresentationStyle.OverCurrentContext
         
-        // メインビュー
-        view.frame = UIScreen.mainScreen().applicationFrame
-        view.autoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth
-        view.alpha = 0
-        view.addSubview(alertView)
+        // Overlay View
+        self.view.frame = UIScreen.mainScreen().applicationFrame
+        self.view.autoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth
+        self.view.alpha = 0
+        self.view.addSubview(alertView)
         
-        // アラートビュー
-        //alertView.layer.cornerRadius = 5
-        //alertView.layer.masksToBounds = true
-        //alertView.layer.borderWidth = 0.5
-        
-        // タイトルラベル
-        titleLabel.numberOfLines = 1
-        titleLabel.textAlignment = .Center
-        titleLabel.text = title
-        // 高さを修正
-        if (title == nil || title!.isEmpty) {
-            titleLabelHeight = 0
+        // Title Label
+        if (title != nil && title != "") {
+            titleLabel.numberOfLines = 1
+            titleLabel.textAlignment = .Center
+            titleLabel.text = title
+            alertView.addSubview(titleLabel)
         }
-        alertView.addSubview(titleLabel)
-        
-        // メッセージビュー
-        messageView.editable = false
-        messageView.textAlignment = .Center
-        messageView.textContainerInset = UIEdgeInsetsZero
-        messageView.textContainer.lineFragmentPadding = 0;
-        alertView.addSubview(messageView)
+        // Message View
+        if (message != nil && message != "") {
+            messageView.text = message
+            messageView.editable = false
+            messageView.textAlignment = .Center
+            messageView.textContainerInset = UIEdgeInsetsZero
+            messageView.textContainer.lineFragmentPadding = 0;
+            alertView.addSubview(messageView)
+        }
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
@@ -144,7 +134,7 @@ class DOAlertController : UIViewController {
     
     func addAction(action: DOAlertAction) {
         
-        // ２つ目のキャンセルはエラー
+        // Error
         if (action.style == DOAlertActionStyle.Cancel) {
             for ac in actions {
                 if (ac.style == DOAlertActionStyle.Cancel) {
@@ -155,10 +145,10 @@ class DOAlertController : UIViewController {
             }
         }
         
-        // アクションを追加
+        // Add Action
         actions.append(action)
         
-        // ビューにボタンを追加
+        // Add Button
         let button = UIButton()
         button.layer.masksToBounds = true
         button.setTitle(action.title, forState: .Normal)
@@ -183,18 +173,18 @@ class DOAlertController : UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        // 色の設定
-        view.backgroundColor = overlayBgColor
+        // Color Settings
+        view.backgroundColor = overlayColor
         alertView.backgroundColor = alertViewBgColor
         titleLabel.textColor = titleTextColor
         messageView.backgroundColor = alertView.backgroundColor
         messageView.textColor = messageTextColor
         
-        // フォントの設定
+        // Fonts Settings
         titleLabel.font = titleFont
         messageView.font = messageFont
         
-        // スクリーンサイズ
+        // Screen Size
         var screenSize = UIScreen.mainScreen().bounds.size
         
         // iOS8.0より前のバージョンで、デバイス回転時の幅と高さのスイッチが行われない対応
@@ -206,31 +196,37 @@ class DOAlertController : UIViewController {
             }
         }
         
-        // メインViewのframe
-        view.frame.size = screenSize
+        // OverlayView
+        self.view.frame.size = screenSize
         
-        // Content Viewのパーツ
+        // AlertView
+        //alertView.layer.cornerRadius = 5
+        //alertView.layer.masksToBounds = true
+        //alertView.layer.borderWidth = 0.5
+        
+        let alertViewPadding: CGFloat = 15.0
+        let alertViewWidth: CGFloat = 270.0
+        
         let innerContentWidth = alertViewWidth - alertViewPadding * 2
         var y = alertViewPadding
         
-        // Title Labelのframe
+        // TitleLabel
+        let titleLabelHeight: CGFloat = (title == nil || title!.isEmpty) ? 0.0 : 20.0
         if (titleLabelHeight > 0.0) {
             titleLabel.frame = CGRect(x: alertViewPadding, y: y, width: innerContentWidth, height: titleLabelHeight)
             y += titleLabelHeight + alertViewPadding
         }
         
-        // 高さを修正
-        if (message != nil && !message!.isEmpty) {
-            messageView.text = message
+        // MessageView
+        if (message != nil && message != "") {
+            var messageViewHeight: CGFloat = 0.0
+            
             // Adjust text view size, if necessary
             let nsstr = message! as NSString
             let attr = [NSFontAttributeName: messageView.font]
             let messageViewSize = CGSize(width: innerContentWidth, height: messageViewHeight)
             let rect = nsstr.boundingRectWithSize(messageViewSize, options: NSStringDrawingOptions.UsesLineFragmentOrigin, attributes:attr, context:nil)
             messageViewHeight = ceil(rect.size.height)
-        }
-        // Message Viewのframe
-        if (messageViewHeight > 0.0) {
             messageView.frame = CGRect(x: alertViewPadding, y: y, width: innerContentWidth, height: messageViewHeight)
             y += messageViewHeight + alertViewPadding
         }
@@ -243,6 +239,7 @@ class DOAlertController : UIViewController {
         }*/
         
         // Buttons
+        let buttonMargin: CGFloat = 10.0
         for btn in buttons {
             btn.frame = CGRect(x: alertViewPadding, y: y, width: innerContentWidth, height: buttonHeight)
             y += buttonHeight + buttonMargin
@@ -250,7 +247,7 @@ class DOAlertController : UIViewController {
             btn.titleLabel?.font = buttonFont
         }
         
-        // Content Viewのframe
+        // AlertView frame
         let alertViewHeight = y - buttonMargin + alertViewPadding
         var x = (screenSize.width - alertViewWidth) / 2
         y = (screenSize.height - alertViewHeight) / 2
@@ -276,7 +273,7 @@ class DOAlertController : UIViewController {
         })
     }
     
-    // UIColor -> UIImage 変換
+    // UIColor -> UIImage
     func createImageFromUIColor(var color: UIColor) -> UIImage {
         let rect = CGRectMake(0, 0, 1, 1)
         UIGraphicsBeginImageContext(rect.size)
@@ -288,7 +285,7 @@ class DOAlertController : UIViewController {
         return img
     }
     
-    // ボタンタップ時のアクション
+    // Button Tapped Action
     func buttonTapped(sender: UIButton) {
         let action = self.actions[sender.tag - 1]
         if (action.handler != nil) {
@@ -297,7 +294,7 @@ class DOAlertController : UIViewController {
         self.hideView()
     }
     
-    // 閉じる
+    // Hide
     func hideView() {
         UIView.animateWithDuration(0.2, animations: {
             self.view.alpha = 0

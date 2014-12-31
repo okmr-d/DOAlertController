@@ -74,7 +74,7 @@ class ViewController: UIViewController {
         var alertController = DOAlertController(title: "Title", message: "Message Message!", preferredStyle: .Alert)
         
         // OverlayView
-        alertController.overlayBgColor = UIColor(red:1, green:1, blue:1, alpha:0.7)
+        alertController.overlayColor = UIColor(red:1, green:1, blue:1, alpha:0.7)
         // AlertView
         alertController.alertViewBgColor = UIColor(red:230/255, green:230/255, blue:230/255, alpha:1)
         // TitleLabel
