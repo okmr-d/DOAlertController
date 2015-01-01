@@ -66,10 +66,12 @@ class DOAlertController : UIViewController {
     var messageFont = UIFont(name: "HelveticaNeue", size: 15)
     var messageTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
+    // TextFields
+    var textFields: [AnyObject]?
+    
     // Buttons
     private var buttons = [UIButton]()
     var buttonFont = UIFont(name: "HelveticaNeue-Bold", size: 16)
-    
     var buttonBgColor: [DOAlertActionStyle : UIColor] = [
         .Default : UIColor(red:52/255, green:152/255, blue:219/255, alpha:1),
         .Cancel  : UIColor(red:128/255, green:128/255, blue:128/255, alpha:1),
@@ -81,12 +83,10 @@ class DOAlertController : UIViewController {
         .Destructive  : UIColor(red:236/255, green:112/255, blue:99/255, alpha:1)
     ]
     
-    var actions: [DOAlertAction] = [DOAlertAction]()
+    // Actions
+    private var actions: [DOAlertAction] = [DOAlertAction]()
     
-    func addTextFieldWithConfigurationHandler(configurationHandler: ((UITextField!) -> Void)!) {
-    }
-    var textFields: [AnyObject]?
-    
+    // Initializer
     init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
         super.init(nibName: nil, bundle: nil)
         
@@ -129,36 +129,6 @@ class DOAlertController : UIViewController {
     
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    func addAction(action: DOAlertAction) {
-        
-        // Error
-        if (action.style == DOAlertActionStyle.Cancel) {
-            for ac in actions {
-                if (ac.style == DOAlertActionStyle.Cancel) {
-                    var error: NSError?
-                    NSException.raise("NSInternalInconsistencyException", format:"DOAlertController can only have one action with a style of DOAlertActionStyle.Cancel", arguments:getVaList([error!]))
-                    return
-                }
-            }
-        }
-        
-        // Add Action
-        actions.append(action)
-        
-        // Add Button
-        let button = UIButton()
-        button.layer.masksToBounds = true
-        button.setTitle(action.title, forState: .Normal)
-        button.enabled = action.enabled
-        button.layer.cornerRadius = 4.0
-        button.addTarget(self, action: Selector("buttonTapped:"), forControlEvents: .TouchUpInside)
-        alertView.addSubview(button)
-        buttons.append(button)
-        button.tag = buttons.count
-        button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), forState: UIControlState.Normal)
-        button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), forState: UIControlState.Highlighted)
     }
     
     override func viewWillLayoutSubviews() {
@@ -273,16 +243,38 @@ class DOAlertController : UIViewController {
         })
     }
     
-    // UIColor -> UIImage
-    func createImageFromUIColor(var color: UIColor) -> UIImage {
-        let rect = CGRectMake(0, 0, 1, 1)
-        UIGraphicsBeginImageContext(rect.size)
-        let contextRef: CGContextRef = UIGraphicsGetCurrentContext()
-        CGContextSetFillColorWithColor(contextRef, color.CGColor)
-        CGContextFillRect(contextRef, rect)
-        let img: UIImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return img
+    // Add Action(Button)
+    func addAction(action: DOAlertAction) {
+        // Error
+        if (action.style == DOAlertActionStyle.Cancel) {
+            for ac in actions {
+                if (ac.style == DOAlertActionStyle.Cancel) {
+                    var error: NSError?
+                    NSException.raise("NSInternalInconsistencyException", format:"DOAlertController can only have one action with a style of DOAlertActionStyle.Cancel", arguments:getVaList([error!]))
+                    return
+                }
+            }
+        }
+        // Add Action
+        actions.append(action)
+        
+        // Add Button
+        let button = UIButton()
+        button.layer.masksToBounds = true
+        button.setTitle(action.title, forState: .Normal)
+        button.enabled = action.enabled
+        button.layer.cornerRadius = 4.0
+        button.addTarget(self, action: Selector("buttonTapped:"), forControlEvents: .TouchUpInside)
+        alertView.addSubview(button)
+        buttons.append(button)
+        button.tag = buttons.count
+        button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), forState: UIControlState.Normal)
+        button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), forState: UIControlState.Highlighted)
+    }
+    
+    // Add TextField
+    func addTextFieldWithConfigurationHandler(configurationHandler: ((UITextField!) -> Void)!) {
+        
     }
     
     // Button Tapped Action
@@ -301,5 +293,17 @@ class DOAlertController : UIViewController {
             }, completion: { finished in
                 self.dismissViewControllerAnimated(false, completion: nil)
         })
+    }
+    
+    // UIColor -> UIImage
+    func createImageFromUIColor(var color: UIColor) -> UIImage {
+        let rect = CGRectMake(0, 0, 1, 1)
+        UIGraphicsBeginImageContext(rect.size)
+        let contextRef: CGContextRef = UIGraphicsGetCurrentContext()
+        CGContextSetFillColorWithColor(contextRef, color.CGColor)
+        CGContextFillRect(contextRef, rect)
+        let img: UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return img
     }
 }
