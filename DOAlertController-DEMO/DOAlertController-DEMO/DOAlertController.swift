@@ -186,7 +186,7 @@ class DOAlertController : UIViewController {
         // Screen Size
         var screenSize = UIScreen.mainScreen().bounds.size
         
-        // iOS8.0より前のバージョンで、デバイス回転時の幅と高さのスイッチが行われない対応
+        // iOS Version < 8.0
         let verStr = UIDevice.currentDevice().systemVersion as NSString
         let ver = verStr.floatValue
         if (ver < 8.0) {
