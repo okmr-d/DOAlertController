@@ -19,7 +19,7 @@ enum DOAlertActionStyle : Int {
 }
 
 enum DOAlertControllerStyle : Int {
-    //case ActionSheet
+    case ActionSheet
     case Alert
 }
 
@@ -43,31 +43,35 @@ class DOAlertAction : NSObject, NSCopying {
     }
 }
 
-class DOAlertController : UIViewController {
+class DOAlertController : UIViewController, UITextFieldDelegate {
     
+    // Message
+    var message: String?
     // AlertController Style
-    var preferredStyle: DOAlertControllerStyle?
+    private(set) var preferredStyle: DOAlertControllerStyle?
     
     // Overlay Color
     var overlayColor = UIColor(red:0, green:0, blue:0, alpha:0.7)
     
-    // Alert View
+    // AlertView
     private var alertView = UIView()
     var alertViewBgColor = UIColor(red:239/255, green:240/255, blue:242/255, alpha:1.0)
     
-    // Title
+    // TitleLabel
     private var titleLabel = UILabel()
     var titleFont = UIFont(name: "HelveticaNeue-Bold", size: 18)
     var titleTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
-    // Message
+    // MessageView
     private var messageView = UITextView()
-    private var message: String?
     var messageFont = UIFont(name: "HelveticaNeue", size: 15)
     var messageTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
     // TextFields
-    var textFields: [AnyObject]?
+    private(set) var textFields: [AnyObject] = []
+    
+    // Actions
+    private(set) var actions: [AnyObject] = []
     
     // Buttons
     private var buttons = [UIButton]()
@@ -83,12 +87,10 @@ class DOAlertController : UIViewController {
         .Destructive  : UIColor(red:236/255, green:112/255, blue:99/255, alpha:1)
     ]
     
-    // Actions
-    private var actions: [DOAlertAction] = [DOAlertAction]()
     
     // Initializer
-    init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
-        super.init(nibName: nil, bundle: nil)
+    convenience init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
+        self.init(nibName: nil, bundle: nil)
         
         self.title = title
         self.message = message
@@ -243,43 +245,9 @@ class DOAlertController : UIViewController {
         })
     }
     
-    // Add Action(Button)
-    func addAction(action: DOAlertAction) {
-        // Error
-        if (action.style == DOAlertActionStyle.Cancel) {
-            for ac in actions {
-                if (ac.style == DOAlertActionStyle.Cancel) {
-                    var error: NSError?
-                    NSException.raise("NSInternalInconsistencyException", format:"DOAlertController can only have one action with a style of DOAlertActionStyle.Cancel", arguments:getVaList([error!]))
-                    return
-                }
-            }
-        }
-        // Add Action
-        actions.append(action)
-        
-        // Add Button
-        let button = UIButton()
-        button.layer.masksToBounds = true
-        button.setTitle(action.title, forState: .Normal)
-        button.enabled = action.enabled
-        button.layer.cornerRadius = 4.0
-        button.addTarget(self, action: Selector("buttonTapped:"), forControlEvents: .TouchUpInside)
-        alertView.addSubview(button)
-        buttons.append(button)
-        button.tag = buttons.count
-        button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), forState: UIControlState.Normal)
-        button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), forState: UIControlState.Highlighted)
-    }
-    
-    // Add TextField
-    func addTextFieldWithConfigurationHandler(configurationHandler: ((UITextField!) -> Void)!) {
-        
-    }
-    
     // Button Tapped Action
     func buttonTapped(sender: UIButton) {
-        let action = self.actions[sender.tag - 1]
+        let action = self.actions[sender.tag - 1] as! DOAlertAction
         if (action.handler != nil) {
             action.handler(action)
         }
@@ -305,5 +273,70 @@ class DOAlertController : UIViewController {
         let img: UIImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return img
+    }
+    
+    // MARK: DOAlertController Public Methods
+    
+    // Attaches an action object to the alert or action sheet.
+    func addAction(action: DOAlertAction) {
+        // Error
+        if (action.style == DOAlertActionStyle.Cancel) {
+            for ac in actions as! [DOAlertAction] {
+                if (ac.style == DOAlertActionStyle.Cancel) {
+                    var error: NSError?
+                    NSException.raise("NSInternalInconsistencyException", format:"DOAlertController can only have one action with a style of DOAlertActionStyle.Cancel", arguments:getVaList([error!]))
+                    return
+                }
+            }
+        }
+        // Add Action
+        actions.append(action)
+        
+        // Add Button
+        let button = UIButton()
+        button.layer.masksToBounds = true
+        button.setTitle(action.title, forState: .Normal)
+        button.enabled = action.enabled
+        button.layer.cornerRadius = 4.0
+        button.addTarget(self, action: Selector("buttonTapped:"), forControlEvents: .TouchUpInside)
+        alertView.addSubview(button)
+        buttons.append(button)
+        button.tag = buttons.count
+        button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), forState: UIControlState.Normal)
+        button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), forState: UIControlState.Highlighted)
+    }
+    
+    // Adds a text field to an alert.
+    func addTextFieldWithConfigurationHandler(configurationHandler: ((UITextField!) -> Void)!) {
+        
+        // You can add a text field only if the preferredStyle property is set to DOAlertControllerStyle.Alert.
+        if (self.preferredStyle == DOAlertControllerStyle.ActionSheet) {
+            var error: NSError?
+            NSException.raise("NSInternalInconsistencyException", format: "Text fields can only be added to an alert controller of style DOAlertControllerStyle.Alert", arguments:getVaList([error!]))
+            return
+        }
+        
+        let textFieldHeight: CGFloat = 20.0
+        let textFieldWidth: CGFloat = 234.0
+        
+        var textField = UITextField(frame: CGRectMake(0.0, 0.0, textFieldWidth, textFieldHeight))
+        textField.borderStyle = UITextBorderStyle.None
+        textField.layer.borderWidth = 0.5
+        textField.layer.borderColor = UIColor.grayColor().CGColor
+        textField.delegate = self
+        if ((configurationHandler) != nil) {
+            configurationHandler(textField)
+        }
+        self.textFields.append(textField)
+    }
+    
+    // MARK: UITextFieldDelegate Methods
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        if (textField.canResignFirstResponder()) {
+            textField.resignFirstResponder()
+            self.dismissViewControllerAnimated(false, completion: nil)
+        }
+        return true
     }
 }
