@@ -68,7 +68,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
     var messageTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
     // TextFields
-    private(set) var textFields: [AnyObject] = []
+    private(set) var textFields: [AnyObject]?
     
     // Actions
     private(set) var actions: [AnyObject] = []
@@ -131,14 +131,6 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
     
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -208,7 +200,20 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
         txt.layer.cornerRadius = 3
         y += 40
         }*/
-        
+        if (self.textFields != nil && self.textFields!.count > 0) {
+            let textFieldHeight: CGFloat = 30.0
+            //self.textFieldHeightConstraint.constant = textFieldCount * kTextFieldHeight
+            //self.textFieldContentView.backgroundColor = UIColor.whiteColor()
+            for (i, obj) in enumerate(self.textFields!) {
+                let textField = obj as! UITextField
+                textField.frame = CGRect(x: alertViewPadding, y: y, width: innerContentWidth, height: textFieldHeight)
+                //self.textFieldContentViewaddSubview:textField
+                self.alertView.addSubview(textField)
+                y += textFieldHeight
+            }
+            y += alertViewPadding
+        }
+
         // Buttons
         let buttonHeight: CGFloat = 44.0
         let buttonMargin: CGFloat = 10.0
@@ -315,6 +320,9 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
             NSException.raise("NSInternalInconsistencyException", format: "Text fields can only be added to an alert controller of style DOAlertControllerStyle.Alert", arguments:getVaList([error!]))
             return
         }
+        if (self.textFields == nil) {
+            self.textFields = []
+        }
         
         let textFieldHeight: CGFloat = 20.0
         let textFieldWidth: CGFloat = 234.0
@@ -327,7 +335,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
         if ((configurationHandler) != nil) {
             configurationHandler(textField)
         }
-        self.textFields.append(textField)
+        self.textFields!.append(textField)
     }
     
     // MARK: UITextFieldDelegate Methods
