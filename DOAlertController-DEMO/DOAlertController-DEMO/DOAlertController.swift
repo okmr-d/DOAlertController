@@ -289,7 +289,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
             for ac in actions as! [DOAlertAction] {
                 if (ac.style == DOAlertActionStyle.Cancel) {
                     var error: NSError?
-                    NSException.raise("NSInternalInconsistencyException", format:"DOAlertController can only have one action with a style of DOAlertActionStyle.Cancel", arguments:getVaList([error!]))
+                    NSException.raise("NSInternalInconsistencyException", format:"DOAlertController can only have one action with a style of DOAlertActionStyleCancel", arguments:getVaList([error ?? "nil"]))
                     return
                 }
             }
@@ -317,7 +317,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
         // You can add a text field only if the preferredStyle property is set to DOAlertControllerStyle.Alert.
         if (self.preferredStyle == DOAlertControllerStyle.ActionSheet) {
             var error: NSError?
-            NSException.raise("NSInternalInconsistencyException", format: "Text fields can only be added to an alert controller of style DOAlertControllerStyle.Alert", arguments:getVaList([error!]))
+            NSException.raise("NSInternalInconsistencyException", format: "Text fields can only be added to an alert controller of style DOAlertControllerStyleAlert", arguments:getVaList([error ?? "nil"]))
             return
         }
         if (self.textFields == nil) {
