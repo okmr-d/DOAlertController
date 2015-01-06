@@ -12,6 +12,8 @@
 import Foundation
 import UIKit
 
+let DOAlertActionChangeEnabledProperty = "DOAlertActionChangeEnabledProperty"
+
 enum DOAlertActionStyle : Int {
     case Default
     case Cancel
@@ -27,7 +29,13 @@ class DOAlertAction : NSObject, NSCopying {
     var title: String
     var style: DOAlertActionStyle
     var handler: ((DOAlertAction!) -> Void)!
-    var enabled: Bool
+    var enabled: Bool {
+        didSet {
+            if (oldValue != enabled) {
+                NSNotificationCenter.defaultCenter().postNotificationName(DOAlertActionChangeEnabledProperty, object: nil)
+            }
+        }
+    }
     
     required init(title: String, style: DOAlertActionStyle, handler: ((DOAlertAction!) -> Void)!) {
         self.title = title
@@ -123,6 +131,8 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
             messageView.textContainer.lineFragmentPadding = 0;
             alertView.addSubview(messageView)
         }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "relaodButtonsEnabled:", name: DOAlertActionChangeEnabledProperty, object: nil)
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
@@ -278,6 +288,12 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
         let img: UIImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return img
+    }
+    
+    @objc func relaodButtonsEnabled(notification: NSNotification?) {
+        for i in 0..<buttons.count {
+            buttons[i].enabled = actions[i].enabled
+        }
     }
     
     // MARK: DOAlertController Public Methods

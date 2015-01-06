@@ -273,6 +273,6 @@ class ViewController : UITableViewController {
         
         action(selectedIndexPath: indexPath)
         
-        tableView.deselectRowAtIndexPath(indexPath, animated: false)
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 }
