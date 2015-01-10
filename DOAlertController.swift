@@ -173,10 +173,6 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
         self.view.frame.size = screenSize
         
         // AlertView
-        //alertView.layer.cornerRadius = 5
-        //alertView.layer.masksToBounds = true
-        //alertView.layer.borderWidth = 0.5
-        
         let alertViewPadding: CGFloat = 15.0
         let alertViewWidth: CGFloat = 270.0
         
@@ -204,20 +200,12 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
             y += messageViewHeight + alertViewPadding
         }
         
-        // Text fields
-        /*for txt in inputs {
-        txt.frame = CGRect(x: padding, y: y, width: innerContentWidth, height:30)
-        txt.layer.cornerRadius = 3
-        y += 40
-        }*/
+        // TextFields
         if (self.textFields != nil && self.textFields!.count > 0) {
             let textFieldHeight: CGFloat = 30.0
-            //self.textFieldHeightConstraint.constant = textFieldCount * kTextFieldHeight
-            //self.textFieldContentView.backgroundColor = UIColor.whiteColor()
             for (i, obj) in enumerate(self.textFields!) {
                 let textField = obj as! UITextField
                 textField.frame = CGRect(x: alertViewPadding, y: y, width: innerContentWidth, height: textFieldHeight)
-                //self.textFieldContentViewaddSubview:textField
                 self.alertView.addSubview(textField)
                 y += textFieldHeight
             }
