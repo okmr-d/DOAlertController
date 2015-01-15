@@ -51,7 +51,105 @@ class DOAlertAction : NSObject, NSCopying {
     }
 }
 
-class DOAlertController : UIViewController, UITextFieldDelegate {
+class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
+
+    let isPresenting: Bool
+    
+    init(isPresenting: Bool) {
+        self.isPresenting = isPresenting
+    }
+    
+    func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> NSTimeInterval {
+        return 0.25
+    }
+    
+    func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
+        if(self.isPresenting){
+            self.executePresentingAnimation(transitionContext)
+        } else {
+            self.executeDismissingAnimation(transitionContext)
+        }
+    }
+    
+    func executePresentingAnimation(transitionContext: UIViewControllerContextTransitioning) {
+    
+        var screenSize: CGSize = UIScreen.mainScreen().bounds.size
+        let verStr = UIDevice.currentDevice().systemVersion as NSString
+        let ver = verStr.floatValue
+        if (ver < 8.0) {
+            if (UIInterfaceOrientationIsLandscape(UIApplication.sharedApplication().statusBarOrientation)) {
+                screenSize = CGSize(width:screenSize.height, height:screenSize.width)
+            }
+        }
+        var containerView = transitionContext.containerView()
+    
+        var toViewController = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey)!
+        toViewController.view.frame = CGRectMake(0.0, 0.0, screenSize.width, screenSize.height)
+        toViewController.view.alpha = 0.0
+        if (toViewController is DOAlertController) {
+            var alertController = toViewController as! DOAlertController
+            if (alertController.preferredStyle == DOAlertControllerStyle.Alert) {
+                alertController.alertView.center = alertController.view.center
+                alertController.alertView.transform = CGAffineTransformMakeScale(0.5, 0.5)
+            }
+        }
+        containerView.addSubview(toViewController.view)
+        
+        UIView.animateWithDuration(self.transitionDuration(transitionContext),
+            animations: {
+                toViewController.view.alpha = 1.0
+                if let alertController = toViewController as? DOAlertController {
+                    if (alertController.preferredStyle == DOAlertControllerStyle.Alert) {
+                        alertController.alertView.transform = CGAffineTransformMakeScale(1.05, 1.05)
+                    }
+                }
+            },
+            completion: { finished in
+                
+                UIView.animateWithDuration(0.2,
+                    animations: {
+                        if let alertController = toViewController as? DOAlertController {
+                            alertController.alertView.transform = CGAffineTransformIdentity
+                        }
+                    },
+                    completion: { (finished) -> Void in
+                        if (finished) {
+                            transitionContext.completeTransition(!transitionContext.transitionWasCancelled())
+                        }
+                    })
+            })
+    }
+    
+    func executeDismissingAnimation(transitionContext: UIViewControllerContextTransitioning) {
+        
+        var screenSize: CGSize = UIScreen.mainScreen().bounds.size
+        let verStr = UIDevice.currentDevice().systemVersion as NSString
+        let ver = verStr.floatValue
+        if (ver < 8.0) {
+            if (UIInterfaceOrientationIsLandscape(UIApplication.sharedApplication().statusBarOrientation)) {
+                screenSize = CGSize(width:screenSize.height, height:screenSize.width)
+            }
+        }
+        var containerView = transitionContext.containerView()
+        
+        var toViewController = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey)!
+        var fromViewController = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey)!
+        toViewController.view.frame = CGRectMake(0.0, 0.0, screenSize.width, screenSize.height)
+        containerView.insertSubview(toViewController.view, belowSubview: fromViewController.view)
+        
+        UIView.animateWithDuration(self.transitionDuration(transitionContext),
+            animations: {
+                fromViewController.view.alpha = 0.0
+            },
+            completion: { (finished) -> Void in
+                if (finished) {
+                    transitionContext.completeTransition(!transitionContext.transitionWasCancelled())
+                }
+            })
+    }
+}
+
+class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControllerTransitioningDelegate {
     
     // Message
     var message: String?
@@ -95,7 +193,6 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
         .Destructive  : UIColor(red:236/255, green:112/255, blue:99/255, alpha:1)
     ]
     
-    
     // Initializer
     convenience init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
         self.init(nibName: nil, bundle: nil)
@@ -133,6 +230,8 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
         }
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "relaodButtonsEnabled:", name: DOAlertActionChangeEnabledProperty, object: nil)
+        
+        self.transitioningDelegate = self
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
@@ -231,7 +330,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        
+        /*
         alertView.center = view.center
         alertView.transform = CGAffineTransformMakeScale(0.5, 0.5)
         
@@ -245,7 +344,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
                 UIView.animateWithDuration(0.2, animations: {
                     self.alertView.transform = CGAffineTransformIdentity
                 })
-        })
+        })*/
     }
     
     // Button Tapped Action
@@ -350,5 +449,15 @@ class DOAlertController : UIViewController, UITextFieldDelegate {
             self.dismissViewControllerAnimated(false, completion: nil)
         }
         return true
+    }
+    
+    // MARK: UIViewControllerTransitioningDelegate Methods
+    
+    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DOAlertAnimation(isPresenting: true)
+    }
+    
+    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DOAlertAnimation(isPresenting: false)
     }
 }

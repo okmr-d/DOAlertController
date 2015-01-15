@@ -51,7 +51,7 @@ class ViewController : UITableViewController {
         // Add the action.
         alertController.addAction(cancelAction)
         
-        presentViewController(alertController, animated: false, completion: nil)
+        presentViewController(alertController, animated: true, completion: nil)
     }
     
     /// Show an alert with an "Okay" and "Cancel" button.
@@ -76,7 +76,7 @@ class ViewController : UITableViewController {
         alertCotroller.addAction(cancelAction)
         alertCotroller.addAction(otherAction)
         
-        presentViewController(alertCotroller, animated: false, completion: nil)
+        presentViewController(alertCotroller, animated: true, completion: nil)
     }
     
     /// Show an alert with two custom buttons.
@@ -107,7 +107,7 @@ class ViewController : UITableViewController {
         alertController.addAction(otherButtonOneAction)
         alertController.addAction(otherButtonTwoAction)
         
-        presentViewController(alertController, animated: false, completion: nil)
+        presentViewController(alertController, animated: true, completion: nil)
     }
     
     /// Show a text entry alert with two custom buttons.
@@ -137,7 +137,7 @@ class ViewController : UITableViewController {
         alertController.addAction(cancelAction)
         alertController.addAction(otherAction)
         
-        presentViewController(alertController, animated: false, completion: nil)
+        presentViewController(alertController, animated: true, completion: nil)
     }
     
     /// Show a secure text entry alert with two custom buttons.
@@ -187,7 +187,7 @@ class ViewController : UITableViewController {
         alertController.addAction(cancelAction)
         alertController.addAction(otherAction)
         
-        presentViewController(alertController, animated: false, completion: nil)
+        presentViewController(alertController, animated: true, completion: nil)
     }
     
     // MARK: DOAlertControllerStyleActionSheet Style Alerts
@@ -221,7 +221,7 @@ class ViewController : UITableViewController {
             popoverPresentationController.permittedArrowDirections = .Up
         }
         
-        presentViewController(alertController, animated: false, completion: nil)
+        presentViewController(alertController, animated: true, completion: nil)
     }
     
     /// Show a dialog with two custom buttons.
@@ -253,7 +253,7 @@ class ViewController : UITableViewController {
             popoverPresentationController.permittedArrowDirections = .Up
         }
         
-        presentViewController(alertController, animated: false, completion: nil)
+        presentViewController(alertController, animated: true, completion: nil)
     }
     
     // MARK: UITextFieldTextDidChangeNotification
