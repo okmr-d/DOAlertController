@@ -93,7 +93,6 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
                 alertController.alertView.transform = CGAffineTransformMakeScale(0.5, 0.5)
             }
         }
-        containerView.addSubview(toViewController.view)
         
         UIView.animateWithDuration(self.transitionDuration(transitionContext),
             animations: {
@@ -135,7 +134,6 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
         var toViewController = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey)!
         var fromViewController = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey)!
         toViewController.view.frame = CGRectMake(0.0, 0.0, screenSize.width, screenSize.height)
-        containerView.insertSubview(toViewController.view, belowSubview: fromViewController.view)
         
         UIView.animateWithDuration(self.transitionDuration(transitionContext),
             animations: {
@@ -328,41 +326,13 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         alertView.frame = CGRect(x: x, y: y, width: alertViewWidth, height: alertViewHeight)
     }
     
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
-        /*
-        alertView.center = view.center
-        alertView.transform = CGAffineTransformMakeScale(0.5, 0.5)
-        
-        UIView.animateWithDuration(0.25, animations: {
-            
-            self.alertView.transform = CGAffineTransformMakeScale(1.05, 1.05)
-            self.view.alpha = 1
-            
-            }, completion: { finished in
-                
-                UIView.animateWithDuration(0.2, animations: {
-                    self.alertView.transform = CGAffineTransformIdentity
-                })
-        })*/
-    }
-    
     // Button Tapped Action
     func buttonTapped(sender: UIButton) {
         let action = self.actions[sender.tag - 1] as! DOAlertAction
         if (action.handler != nil) {
             action.handler(action)
         }
-        self.hideView()
-    }
-    
-    // Hide
-    func hideView() {
-        UIView.animateWithDuration(0.2, animations: {
-            self.view.alpha = 0
-            }, completion: { finished in
-                self.dismissViewControllerAnimated(false, completion: nil)
-        })
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     // UIColor -> UIImage
@@ -446,7 +416,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         if (textField.canResignFirstResponder()) {
             textField.resignFirstResponder()
-            self.dismissViewControllerAnimated(false, completion: nil)
+            self.dismissViewControllerAnimated(true, completion: nil)
         }
         return true
     }
