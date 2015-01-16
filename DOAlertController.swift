@@ -60,18 +60,22 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
     }
     
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> NSTimeInterval {
-        return 0.25
+        if (isPresenting) {
+            return 0.45
+        } else {
+            return 0.25
+        }
     }
     
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
         if(self.isPresenting){
-            self.executePresentingAnimation(transitionContext)
+            self.presentAnimateTransition(transitionContext)
         } else {
-            self.executeDismissingAnimation(transitionContext)
+            self.dismissAnimateTransition(transitionContext)
         }
     }
     
-    func executePresentingAnimation(transitionContext: UIViewControllerContextTransitioning) {
+    func presentAnimateTransition(transitionContext: UIViewControllerContextTransitioning) {
     
         var screenSize: CGSize = UIScreen.mainScreen().bounds.size
         let verStr = UIDevice.currentDevice().systemVersion as NSString
@@ -94,7 +98,7 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
             }
         }
         
-        UIView.animateWithDuration(self.transitionDuration(transitionContext),
+        UIView.animateWithDuration(0.25,
             animations: {
                 toViewController.view.alpha = 1.0
                 if let alertController = toViewController as? DOAlertController {
@@ -111,15 +115,13 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
                             alertController.alertView.transform = CGAffineTransformIdentity
                         }
                     },
-                    completion: { (finished) -> Void in
-                        if (finished) {
-                            transitionContext.completeTransition(!transitionContext.transitionWasCancelled())
-                        }
+                    completion: { finished in
+                        transitionContext.completeTransition(true)
                     })
             })
     }
     
-    func executeDismissingAnimation(transitionContext: UIViewControllerContextTransitioning) {
+    func dismissAnimateTransition(transitionContext: UIViewControllerContextTransitioning) {
         
         var screenSize: CGSize = UIScreen.mainScreen().bounds.size
         let verStr = UIDevice.currentDevice().systemVersion as NSString
@@ -139,10 +141,8 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
             animations: {
                 fromViewController.view.alpha = 0.0
             },
-            completion: { (finished) -> Void in
-                if (finished) {
-                    transitionContext.completeTransition(!transitionContext.transitionWasCancelled())
-                }
+            completion: { finished in
+                transitionContext.completeTransition(true)
             })
     }
 }
