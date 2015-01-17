@@ -12,7 +12,7 @@
 import Foundation
 import UIKit
 
-let DOAlertActionChangeEnabledProperty = "DOAlertActionChangeEnabledProperty"
+let DOAlertActionEnabledDidChangeNotification = "DOAlertActionEnabledDidChangeNotification"
 
 enum DOAlertActionStyle : Int {
     case Default
@@ -32,7 +32,7 @@ class DOAlertAction : NSObject, NSCopying {
     var enabled: Bool {
         didSet {
             if (oldValue != enabled) {
-                NSNotificationCenter.defaultCenter().postNotificationName(DOAlertActionChangeEnabledProperty, object: nil)
+                NSNotificationCenter.defaultCenter().postNotificationName(DOAlertActionEnabledDidChangeNotification, object: nil)
             }
         }
     }
@@ -98,6 +98,9 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
             }
         }
         
+        var fromViewController = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey)!
+        containerView.insertSubview(toViewController.view, belowSubview: fromViewController.view)
+        
         UIView.animateWithDuration(0.25,
             animations: {
                 toViewController.view.alpha = 1.0
@@ -116,7 +119,9 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
                         }
                     },
                     completion: { finished in
-                        transitionContext.completeTransition(true)
+                        if (finished) {
+                            transitionContext.completeTransition(true)
+                        }
                     })
             })
     }
@@ -205,8 +210,8 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         self.modalPresentationStyle = UIModalPresentationStyle.OverCurrentContext
         
         // Overlay View
-        self.view.frame = UIScreen.mainScreen().applicationFrame
-        self.view.autoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth
+        self.view.frame = UIScreen.mainScreen().bounds
+        //self.view.autoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth
         self.view.alpha = 0
         self.view.addSubview(alertView)
         
@@ -227,7 +232,9 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             alertView.addSubview(messageView)
         }
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "relaodButtonsEnabled:", name: DOAlertActionChangeEnabledProperty, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "relaodButtonsEnabled:", name: DOAlertActionEnabledDidChangeNotification, object: nil)
+        //NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
+        //NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
         
         self.transitioningDelegate = self
     }
@@ -321,9 +328,47 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         
         // AlertView frame
         let alertViewHeight = y - buttonMargin + alertViewPadding
-        var x = (screenSize.width - alertViewWidth) / 2
-        y = (screenSize.height - alertViewHeight) / 2
-        alertView.frame = CGRect(x: x, y: y, width: alertViewWidth, height: alertViewHeight)
+        //alertView.frame.size = CGSize(width: alertViewWidth, height: alertViewHeight)
+        self.alertView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        
+        self.view.addConstraints([
+            NSLayoutConstraint(
+                item: self.alertView,
+                attribute: NSLayoutAttribute.CenterX,
+                relatedBy: NSLayoutRelation.Equal,
+                toItem: self.view,
+                attribute: NSLayoutAttribute.CenterX,
+                multiplier: 1.0,
+                constant: 0
+            ),
+            NSLayoutConstraint(
+                item: self.alertView,
+                attribute: NSLayoutAttribute.CenterY,
+                relatedBy: NSLayoutRelation.Equal,
+                toItem: self.view,
+                attribute: NSLayoutAttribute.CenterY,
+                multiplier: 1.0,
+                constant: 0
+            ),
+            NSLayoutConstraint(
+                item: self.alertView,
+                attribute: NSLayoutAttribute.Width,
+                relatedBy: NSLayoutRelation.Equal,
+                toItem: nil,
+                attribute: NSLayoutAttribute.Width,
+                multiplier: 1.0,
+                constant: alertViewWidth
+            ),
+            NSLayoutConstraint(
+                item: self.alertView,
+                attribute: NSLayoutAttribute.Height,
+                relatedBy: NSLayoutRelation.Equal,
+                toItem: nil,
+                attribute: NSLayoutAttribute.Height,
+                multiplier: 1.0,
+                constant: alertViewHeight
+            )]
+        )
     }
     
     // Button Tapped Action
