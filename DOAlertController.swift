@@ -162,9 +162,15 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     // Overlay Color
     var overlayColor = UIColor(red:0, green:0, blue:0, alpha:0.7)
     
+    // ContainerView
+    private var containerView = UIView()
+    private var containerViewBottomSpaceConstraint: NSLayoutConstraint!
+    
     // AlertView
     private var alertView = UIView()
     var alertViewBgColor = UIColor(red:239/255, green:240/255, blue:242/255, alpha:1.0)
+    private let alertViewWidth: CGFloat = 270.0
+    private var alertViewHeightConstraint: NSLayoutConstraint!
     
     // TitleLabel
     private var titleLabel = UILabel()
@@ -213,7 +219,25 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         self.view.frame = UIScreen.mainScreen().bounds
         //self.view.autoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth
         self.view.alpha = 0
-        self.view.addSubview(alertView)
+        self.view.addSubview(containerView)
+        
+        // Container View Layout Constraint
+        self.containerView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        let containerViewTopSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 0.0)
+        let containerViewRightSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 0.0)
+        containerViewBottomSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 0.0)
+        let containerViewLeftSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 0.0)
+        self.view.addConstraints([containerViewTopSpaceConstraint, containerViewRightSpaceConstraint, containerViewBottomSpaceConstraint, containerViewLeftSpaceConstraint])
+        
+        self.containerView.addSubview(alertView)
+        
+        // Alert View Layout Constraint
+        self.alertView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        let alertViewCenterXConstraint = NSLayoutConstraint(item: self.alertView, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.containerView, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0)
+        let alertViewCenterYConstraint = NSLayoutConstraint(item: self.alertView, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: self.containerView, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0)
+        let alertViewWidthConstraint = NSLayoutConstraint(item: self.alertView, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: alertViewWidth)
+        alertViewHeightConstraint = NSLayoutConstraint(item: self.alertView, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: alertViewWidth)
+        self.containerView.addConstraints([alertViewCenterXConstraint, alertViewCenterYConstraint, alertViewWidthConstraint, alertViewHeightConstraint])
         
         // Title Label
         if (title != nil && title != "") {
@@ -232,9 +256,9 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             alertView.addSubview(messageView)
         }
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "relaodButtonsEnabled:", name: DOAlertActionEnabledDidChangeNotification, object: nil)
-        //NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
-        //NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "alertActionEnabledDidChange:", name: DOAlertActionEnabledDidChangeNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
         
         self.transitioningDelegate = self
     }
@@ -278,7 +302,6 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         
         // AlertView
         let alertViewPadding: CGFloat = 15.0
-        let alertViewWidth: CGFloat = 270.0
         
         let innerContentWidth = alertViewWidth - alertViewPadding * 2
         var y = alertViewPadding
@@ -328,47 +351,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         
         // AlertView frame
         let alertViewHeight = y - buttonMargin + alertViewPadding
-        //alertView.frame.size = CGSize(width: alertViewWidth, height: alertViewHeight)
-        self.alertView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        
-        self.view.addConstraints([
-            NSLayoutConstraint(
-                item: self.alertView,
-                attribute: NSLayoutAttribute.CenterX,
-                relatedBy: NSLayoutRelation.Equal,
-                toItem: self.view,
-                attribute: NSLayoutAttribute.CenterX,
-                multiplier: 1.0,
-                constant: 0
-            ),
-            NSLayoutConstraint(
-                item: self.alertView,
-                attribute: NSLayoutAttribute.CenterY,
-                relatedBy: NSLayoutRelation.Equal,
-                toItem: self.view,
-                attribute: NSLayoutAttribute.CenterY,
-                multiplier: 1.0,
-                constant: 0
-            ),
-            NSLayoutConstraint(
-                item: self.alertView,
-                attribute: NSLayoutAttribute.Width,
-                relatedBy: NSLayoutRelation.Equal,
-                toItem: nil,
-                attribute: NSLayoutAttribute.Width,
-                multiplier: 1.0,
-                constant: alertViewWidth
-            ),
-            NSLayoutConstraint(
-                item: self.alertView,
-                attribute: NSLayoutAttribute.Height,
-                relatedBy: NSLayoutRelation.Equal,
-                toItem: nil,
-                attribute: NSLayoutAttribute.Height,
-                multiplier: 1.0,
-                constant: alertViewHeight
-            )]
-        )
+        alertViewHeightConstraint.constant = alertViewHeight
     }
     
     // Button Tapped Action
@@ -392,10 +375,28 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         return img
     }
     
-    @objc func relaodButtonsEnabled(notification: NSNotification?) {
+    @objc func alertActionEnabledDidChange(notification: NSNotification?) {
         for i in 0..<buttons.count {
             buttons[i].enabled = actions[i].enabled
         }
+    }
+    func keyboardWillShow(notification: NSNotification?) {
+        if let userInfo = notification?.userInfo as? [String: NSValue] {
+            let keyboardSize = userInfo[UIKeyboardFrameEndUserInfoKey]!.CGRectValue().size
+            self.containerViewBottomSpaceConstraint.constant = -keyboardSize.height
+            
+            UIView.animateWithDuration(0.25, animations: {
+                self.view.layoutIfNeeded()
+            })
+        }
+    }
+    
+    func keyboardWillHide(notification: NSNotification?) {
+        self.containerViewBottomSpaceConstraint.constant = 0.0
+        
+        UIView.animateWithDuration(0.3, animations: {
+            self.view.layoutIfNeeded()
+        })
     }
     
     // MARK: DOAlertController Public Methods
