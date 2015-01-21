@@ -229,7 +229,6 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         
         // OverlayView
         self.view.frame = UIScreen.mainScreen().bounds
-        //self.view.autoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth
         self.view.alpha = 0
         
         // ContainerView
@@ -313,7 +312,6 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         messageView.backgroundColor = alertView.backgroundColor
         messageView.textColor = messageTextColor
         
-        
         //------------------------------
         // Screen Size
         //------------------------------
@@ -380,6 +378,10 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         
         // ButtonAreaScrollView Height
         var buttonAreaHeight = CGFloat(self.buttons.count) * (buttonHeight + buttonMargin) - buttonMargin + alertViewPadding
+        if (self.preferredStyle == .Alert && self.buttons.count == 2) {
+            buttonAreaHeight -= buttonHeight + buttonMargin
+        }
+        
         if (textAreaHeight + buttonAreaHeight > screenSize.height) {
             buttonAreaHeight += alertViewPadding
             buttonAreaY += alertViewPadding
@@ -387,11 +389,22 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         self.buttonAreaScrollView.contentSize = CGSize(width: alertViewWidth, height: buttonAreaHeight)
         
         // Buttons
-        for btn in buttons {
-            btn.titleLabel?.font = buttonFont
-            btn.frame = CGRect(x: alertViewPadding, y: buttonAreaY, width: innerContentWidth, height: buttonHeight)
-            self.buttonAreaScrollView.addSubview(btn)
-            buttonAreaY += buttonHeight + buttonMargin
+        if (self.preferredStyle == .Alert && self.buttons.count == 2) {
+            let buttonWidth = (innerContentWidth - alertViewPadding) / 2
+            var buttonX = alertViewPadding
+            for btn in self.buttons {
+                btn.titleLabel?.font = self.buttonFont
+                btn.frame = CGRect(x: buttonX, y: buttonAreaY, width: buttonWidth, height: buttonHeight)
+                self.buttonAreaScrollView.addSubview(btn)
+                buttonX += alertViewPadding + buttonWidth
+            }
+        } else {
+            for btn in self.buttons {
+                btn.titleLabel?.font = self.buttonFont
+                btn.frame = CGRect(x: alertViewPadding, y: buttonAreaY, width: innerContentWidth, height: buttonHeight)
+                self.buttonAreaScrollView.addSubview(btn)
+                buttonAreaY += buttonHeight + buttonMargin
+            }
         }
         
         //------------------------------
@@ -455,6 +468,13 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             if (alertViewHeight > maxHeight) {
                 self.alertViewHeightConstraint.constant = maxHeight
             }
+            */
+            /*
+            // AlertView Height Constraint
+            alertViewHeightConstraint.constant = alertViewHeight
+            
+            // ButtonAreaScrollView Height Constraint
+            buttonAreaScrollViewHeightConstraint.constant = buttonAreaHeight
             */
             
             UIView.animateWithDuration(0.25, animations: {
