@@ -243,8 +243,9 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         // buttonAreaScrollView
         self.alertView.addSubview(self.buttonAreaScrollView)
         
-        //----------------------------
+        //------------------------------
         // Layout Constraint Setting
+        //------------------------------
         self.containerView.setTranslatesAutoresizingMaskIntoConstraints(false)
         self.alertView.setTranslatesAutoresizingMaskIntoConstraints(false)
         self.textAreaScrollView.setTranslatesAutoresizingMaskIntoConstraints(false)
@@ -361,7 +362,6 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             for (i, obj) in enumerate(self.textFields!) {
                 let textField = obj as! UITextField
                 textField.frame = CGRect(x: alertViewPadding, y: textAreaY, width: innerContentWidth, height: textFieldHeight)
-                self.textAreaScrollView.addSubview(textField)
                 textAreaY += textFieldHeight
             }
             textAreaY += alertViewPadding
@@ -392,19 +392,29 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         if (self.preferredStyle == .Alert && self.buttons.count == 2) {
             let buttonWidth = (innerContentWidth - alertViewPadding) / 2
             var buttonX = alertViewPadding
-            for btn in self.buttons {
-                btn.titleLabel?.font = self.buttonFont
-                btn.frame = CGRect(x: buttonX, y: buttonAreaY, width: buttonWidth, height: buttonHeight)
-                self.buttonAreaScrollView.addSubview(btn)
+            for button in self.buttons {
+                button.titleLabel?.font = self.buttonFont
+                button.frame = CGRect(x: buttonX, y: buttonAreaY, width: buttonWidth, height: buttonHeight)
                 buttonX += alertViewPadding + buttonWidth
             }
         } else {
-            for btn in self.buttons {
-                btn.titleLabel?.font = self.buttonFont
-                btn.frame = CGRect(x: alertViewPadding, y: buttonAreaY, width: innerContentWidth, height: buttonHeight)
-                self.buttonAreaScrollView.addSubview(btn)
-                buttonAreaY += buttonHeight + buttonMargin
+            var cancelButtonTag = 0
+            for button in self.buttons {
+                let action = self.actions[button.tag - 1] as! DOAlertAction
+                if (action.style != DOAlertActionStyle.Cancel) {
+                    button.titleLabel?.font = self.buttonFont
+                    button.frame = CGRect(x: alertViewPadding, y: buttonAreaY, width: innerContentWidth, height: buttonHeight)
+                    buttonAreaY += buttonHeight + buttonMargin
+                } else {
+                    cancelButtonTag = button.tag
+                }
             }
+            if (cancelButtonTag != 0) {
+                var button = self.buttonAreaScrollView.viewWithTag(cancelButtonTag) as! UIButton
+                button.titleLabel?.font = self.buttonFont
+                button.frame = CGRect(x: alertViewPadding, y: buttonAreaY, width: innerContentWidth, height: buttonHeight)
+            }
+            
         }
         
         //------------------------------
@@ -452,6 +462,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         return img
     }
     
+    // MARK : NSNotification Method
     @objc func alertActionEnabledDidChange(notification: NSNotification?) {
         for i in 0..<buttons.count {
             buttons[i].enabled = actions[i].enabled
@@ -497,7 +508,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     func addAction(action: DOAlertAction) {
         // Error
         if (action.style == DOAlertActionStyle.Cancel) {
-            for ac in actions as! [DOAlertAction] {
+            for ac in self.actions as! [DOAlertAction] {
                 if (ac.style == DOAlertActionStyle.Cancel) {
                     var error: NSError?
                     NSException.raise("NSInternalInconsistencyException", format:"DOAlertController can only have one action with a style of DOAlertActionStyleCancel", arguments:getVaList([error ?? "nil"]))
@@ -506,7 +517,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             }
         }
         // Add Action
-        actions.append(action)
+        self.actions.append(action)
         
         // Add Button
         let button = UIButton()
@@ -518,7 +529,8 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         button.tag = buttons.count + 1
         button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), forState: UIControlState.Normal)
         button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), forState: UIControlState.Highlighted)
-        buttons.append(button)
+        self.buttons.append(button)
+        self.buttonAreaScrollView.addSubview(button)
     }
     
     // Adds a text field to an alert.
@@ -546,6 +558,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             configurationHandler(textField)
         }
         self.textFields!.append(textField)
+        self.textAreaScrollView.addSubview(textField)
     }
     
     // MARK: UITextFieldDelegate Methods
