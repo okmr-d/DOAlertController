@@ -180,6 +180,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     
     // TextAreaScrollView
     private var textAreaScrollView = UIScrollView()
+    private var textAreaHeight: CGFloat = 0.0
     
     // TitleLabel
     private var titleLabel = UILabel()
@@ -194,9 +195,10 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     // TextFields
     private(set) var textFields: [AnyObject]?
     
-    // TextAreaScrollView
+    // ButtonAreaScrollView
     private var buttonAreaScrollView = UIScrollView()
     private var buttonAreaScrollViewHeightConstraint: NSLayoutConstraint!
+    private var buttonAreaHeight: CGFloat = 0.0
     
     // Actions
     private(set) var actions: [AnyObject] = []
@@ -262,7 +264,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         let alertViewCenterXConstraint = NSLayoutConstraint(item: self.alertView, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.containerView, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0)
         let alertViewCenterYConstraint = NSLayoutConstraint(item: self.alertView, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: self.containerView, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0)
         let alertViewWidthConstraint = NSLayoutConstraint(item: self.alertView, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: alertViewWidth)
-        alertViewHeightConstraint = NSLayoutConstraint(item: self.alertView, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: alertViewWidth)
+        alertViewHeightConstraint = NSLayoutConstraint(item: self.alertView, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: 0.0)
         self.containerView.addConstraints([alertViewCenterXConstraint, alertViewCenterYConstraint, alertViewWidthConstraint, alertViewHeightConstraint])
         
         // textAreaScrollView Layout Constraint
@@ -283,6 +285,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "alertActionEnabledDidChange:", name: DOAlertActionEnabledDidChangeNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceOrientationDidChange:", name: UIDeviceOrientationDidChangeNotification, object: nil)
         
         // Delegate
         self.transitioningDelegate = self
@@ -368,7 +371,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         }
         
         // TextAreaScrollView
-        var textAreaHeight = textAreaY
+        self.textAreaHeight = textAreaY
         self.textAreaScrollView.contentSize = CGSize(width: alertViewWidth, height: textAreaHeight)
         
         //------------------------------
@@ -377,13 +380,13 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         var buttonAreaY: CGFloat = 0.0
         
         // ButtonAreaScrollView Height
-        var buttonAreaHeight = CGFloat(self.buttons.count) * (buttonHeight + buttonMargin) - buttonMargin + alertViewPadding
+        self.buttonAreaHeight = CGFloat(self.buttons.count) * (buttonHeight + buttonMargin) - buttonMargin + alertViewPadding
         if (self.preferredStyle == .Alert && self.buttons.count == 2) {
-            buttonAreaHeight -= buttonHeight + buttonMargin
+            self.buttonAreaHeight -= buttonHeight + buttonMargin
         }
         
-        if (textAreaHeight + buttonAreaHeight > screenSize.height) {
-            buttonAreaHeight += alertViewPadding
+        if (self.textAreaHeight + self.buttonAreaHeight > screenSize.height) {
+            self.buttonAreaHeight += alertViewPadding
             buttonAreaY += alertViewPadding
         }
         self.buttonAreaScrollView.contentSize = CGSize(width: alertViewWidth, height: buttonAreaHeight)
@@ -414,31 +417,27 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
                 button.titleLabel?.font = self.buttonFont
                 button.frame = CGRect(x: alertViewPadding, y: buttonAreaY, width: innerContentWidth, height: buttonHeight)
             }
-            
         }
         
-        //------------------------------
-        // Calculate AlertView Height
-        //------------------------------
         // AlertView Height
-        var alertViewHeight = textAreaHeight + buttonAreaHeight
-        
-        // Height Calculation
-        if (buttonAreaHeight > self.view.frame.height) {
-            buttonAreaHeight = self.view.frame.height
-        }
-        if (alertViewHeight > self.view.frame.height) {
-            alertViewHeight = self.view.frame.height
-        }
-        if (textAreaHeight > alertViewHeight - buttonAreaHeight) {
-            textAreaHeight = alertViewHeight - buttonAreaHeight
-        }
+        reloadAlertViewHeight(maxHeight: self.view.frame.height)
+    }
+    
+    // Reload AlertView Height
+    func reloadAlertViewHeight(#maxHeight: CGFloat) {
         
         // AlertView Height Constraint
+        var alertViewHeight = self.textAreaHeight + self.buttonAreaHeight
+        if (alertViewHeight > maxHeight) {
+            alertViewHeight = maxHeight
+        }
         alertViewHeightConstraint.constant = alertViewHeight
         
         // ButtonAreaScrollView Height Constraint
-        buttonAreaScrollViewHeightConstraint.constant = buttonAreaHeight
+        buttonAreaScrollViewHeightConstraint.constant = self.buttonAreaHeight
+        if (self.buttonAreaHeight > maxHeight) {
+            buttonAreaScrollViewHeightConstraint.constant = maxHeight
+        }
     }
     
     // Button Tapped Action
@@ -463,30 +462,17 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     }
     
     // MARK : NSNotification Method
-    @objc func alertActionEnabledDidChange(notification: NSNotification?) {
+    @objc func alertActionEnabledDidChange(notification: NSNotification) {
         for i in 0..<buttons.count {
             buttons[i].enabled = actions[i].enabled
         }
     }
-    func keyboardWillShow(notification: NSNotification?) {
-        if let userInfo = notification?.userInfo as? [String: NSValue] {
+    func keyboardWillShow(notification: NSNotification) {
+        if let userInfo = notification.userInfo as? [String: NSValue] {
             let keyboardSize = userInfo[UIKeyboardFrameEndUserInfoKey]!.CGRectValue().size
             self.containerViewBottomSpaceConstraint.constant = -keyboardSize.height
             
-            /*
-            let alertViewHeight = self.alertViewHeightConstraint.constant
-            let maxHeight = self.view.frame.height - keyboardSize.height
-            if (alertViewHeight > maxHeight) {
-                self.alertViewHeightConstraint.constant = maxHeight
-            }
-            */
-            /*
-            // AlertView Height Constraint
-            alertViewHeightConstraint.constant = alertViewHeight
-            
-            // ButtonAreaScrollView Height Constraint
-            buttonAreaScrollViewHeightConstraint.constant = buttonAreaHeight
-            */
+            reloadAlertViewHeight(maxHeight: self.view.frame.height - keyboardSize.height)
             
             UIView.animateWithDuration(0.25, animations: {
                 self.view.layoutIfNeeded()
@@ -494,12 +480,17 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         }
     }
     
-    func keyboardWillHide(notification: NSNotification?) {
+    func keyboardWillHide(notification: NSNotification) {
         self.containerViewBottomSpaceConstraint.constant = 0.0
+        reloadAlertViewHeight(maxHeight: self.view.frame.height)
         
         UIView.animateWithDuration(0.3, animations: {
             self.view.layoutIfNeeded()
         })
+    }
+    
+    func deviceOrientationDidChange(notification: NSNotification){
+        reloadAlertViewHeight(maxHeight: self.view.frame.height)
     }
     
     // MARK: DOAlertController Public Methods
