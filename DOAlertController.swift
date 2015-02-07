@@ -170,15 +170,27 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     private var textAreaScrollView = UIScrollView()
     private var textAreaHeight: CGFloat = 0.0
     
+    // TextAreaView
+    private var textAreaView = UIView()
+    private var textAreaViewHeightConstraint: NSLayoutConstraint!
+    
     // TitleLabel
     private var titleLabel = UILabel()
     var titleFont = UIFont(name: "HelveticaNeue-Bold", size: 18)
     var titleTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
+    private var titleLabelHeightConstraint: NSLayoutConstraint!
     
     // MessageView
     private var messageView = UILabel()
     var messageFont = UIFont(name: "HelveticaNeue", size: 15)
     var messageTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
+    private var messageViewTopSpaceConstraint: NSLayoutConstraint!
+    private var messageViewHeightConstraint: NSLayoutConstraint!
+    
+    // TextFieldContainerView
+    private var textFieldContainerView = UIView()
+    private var textFieldContainerViewTopSpaceConstraint: NSLayoutConstraint!
+    private var textFieldContainerViewHeightConstraint: NSLayoutConstraint!
     
     // TextFields
     private(set) var textFields: [AnyObject]?
@@ -219,7 +231,15 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         self.definesPresentationContext = true
         self.modalPresentationStyle = UIModalPresentationStyle.Custom
         
+        var screenSize = UIScreen.mainScreen().bounds.size
+        if ((UIDevice.currentDevice().systemVersion as NSString).floatValue < 8.0) {
+            if (UIInterfaceOrientationIsLandscape(UIApplication.sharedApplication().statusBarOrientation)) {
+                screenSize = CGSize(width:screenSize.height, height:screenSize.width)
+            }
+        }
+        
         // OverlayView
+        self.view.frame.size = screenSize
         self.view.addSubview(self.overlayView)
         
         // ContainerView
@@ -228,11 +248,39 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         // AlertView
         self.containerView.addSubview(self.alertView)
         
-        // textAreaScrollView
+        // TextAreaScrollView
         self.alertView.addSubview(self.textAreaScrollView)
         
-        // buttonAreaScrollView
+        // TextAreaView
+        self.textAreaScrollView.addSubview(self.textAreaView)
+        
+        self.textAreaView.addSubview(titleLabel)
+        self.textAreaView.addSubview(messageView)
+        self.textAreaView.addSubview(textFieldContainerView)
+        
+        // ButtonAreaScrollView
         self.alertView.addSubview(self.buttonAreaScrollView)
+        
+        //------------------------------
+        // Variable
+        //------------------------------
+        var alertViewPadding: CGFloat = 15.0
+        var innerContentWidth = alertViewWidth - alertViewPadding * 2
+        let textFieldHeight: CGFloat = 23.0
+        let buttonHeight: CGFloat = 44.0
+        var buttonMargin: CGFloat = 10.0
+        
+        if (!isAlert()) {
+            self.alertViewWidth =  screenSize.width
+            alertViewPadding = 8.0
+            buttonMargin = 8.0
+            
+            innerContentWidth = screenSize.width
+            if (innerContentWidth > screenSize.height) {
+                innerContentWidth = screenSize.height
+            }
+            innerContentWidth -= 16.0
+        }
         
         //------------------------------
         // Layout Constraint Setting
@@ -241,53 +289,104 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         self.containerView.setTranslatesAutoresizingMaskIntoConstraints(false)
         self.alertView.setTranslatesAutoresizingMaskIntoConstraints(false)
         self.textAreaScrollView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        self.textAreaView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        self.titleLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
+        self.messageView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        self.textFieldContainerView.setTranslatesAutoresizingMaskIntoConstraints(false)
         self.buttonAreaScrollView.setTranslatesAutoresizingMaskIntoConstraints(false)
         
-        // OverlayView Layout Constraint
-        let overlayViewTopSpaceConstraint = NSLayoutConstraint(item: self.overlayView, attribute: .Top, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: .Top, multiplier: 1.0, constant: 0.0)
-        let overlayViewRightSpaceConstraint = NSLayoutConstraint(item: self.overlayView, attribute: .Right, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: .Right, multiplier: 1.0, constant: 0.0)
-        let overlayViewLeftSpaceConstraint = NSLayoutConstraint(item: self.overlayView, attribute: .Left, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: .Left, multiplier: 1.0, constant: 0.0)
-        let overlayViewBottomSpaceConstraint = NSLayoutConstraint(item: self.overlayView, attribute: .Bottom, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
+        // OverlayView - self.view
+        let overlayViewTopSpaceConstraint = NSLayoutConstraint(item: self.overlayView, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1.0, constant: 0.0)
+        let overlayViewRightSpaceConstraint = NSLayoutConstraint(item: self.overlayView, attribute: .Right, relatedBy: .Equal, toItem: self.view, attribute: .Right, multiplier: 1.0, constant: 0.0)
+        let overlayViewLeftSpaceConstraint = NSLayoutConstraint(item: self.overlayView, attribute: .Left, relatedBy: .Equal, toItem: self.view, attribute: .Left, multiplier: 1.0, constant: 0.0)
+        let overlayViewBottomSpaceConstraint = NSLayoutConstraint(item: self.overlayView, attribute: .Bottom, relatedBy: .Equal, toItem: self.view, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
         self.view.addConstraints([overlayViewTopSpaceConstraint, overlayViewRightSpaceConstraint, overlayViewLeftSpaceConstraint, overlayViewBottomSpaceConstraint])
         
-        // ContainerView Layout Constraint
-        let containerViewTopSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: .Top, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: .Top, multiplier: 1.0, constant: 0.0)
-        let containerViewRightSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: .Right, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: .Right, multiplier: 1.0, constant: 0.0)
-        let containerViewLeftSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: .Left, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: .Left, multiplier: 1.0, constant: 0.0)
-        containerViewBottomSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: .Bottom, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
+        // ContainerView - self.view
+        let containerViewTopSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1.0, constant: 0.0)
+        let containerViewRightSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: .Right, relatedBy: .Equal, toItem: self.view, attribute: .Right, multiplier: 1.0, constant: 0.0)
+        let containerViewLeftSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: .Left, relatedBy: .Equal, toItem: self.view, attribute: .Left, multiplier: 1.0, constant: 0.0)
+        containerViewBottomSpaceConstraint = NSLayoutConstraint(item: self.containerView, attribute: .Bottom, relatedBy: .Equal, toItem: self.view, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
         self.view.addConstraints([containerViewTopSpaceConstraint, containerViewRightSpaceConstraint, containerViewLeftSpaceConstraint, containerViewBottomSpaceConstraint])
         
-        // AlertView Layout Constraint
         if (isAlert()) {
+            // AlertView - ContainerView
+            let alertViewCenterXConstraint = NSLayoutConstraint(item: self.alertView, attribute: .CenterX, relatedBy: .Equal, toItem: self.containerView, attribute: .CenterX, multiplier: 1.0, constant: 0.0)
+            let alertViewCenterYConstraint = NSLayoutConstraint(item: self.alertView, attribute: .CenterY, relatedBy: .Equal, toItem: self.containerView, attribute: .CenterY, multiplier: 1.0, constant: 0.0)
+            self.containerView.addConstraints([alertViewCenterXConstraint, alertViewCenterYConstraint])
             
-            let alertViewCenterXConstraint = NSLayoutConstraint(item: self.alertView, attribute: .CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.containerView, attribute: .CenterX, multiplier: 1.0, constant: 0.0)
-            let alertViewCenterYConstraint = NSLayoutConstraint(item: self.alertView, attribute: .CenterY, relatedBy: NSLayoutRelation.Equal, toItem: self.containerView, attribute: .CenterY, multiplier: 1.0, constant: 0.0)
-            let alertViewWidthConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: .Width, multiplier: 1.0, constant: alertViewWidth)
-            alertViewHeightConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 0.0)
-            self.containerView.addConstraints([alertViewCenterXConstraint, alertViewCenterYConstraint, alertViewWidthConstraint, alertViewHeightConstraint])
+            // AlertView
+            let alertViewWidthConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .Width, multiplier: 1.0, constant: alertViewWidth)
+            alertViewHeightConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 1000.0)
+            self.alertView.addConstraints([alertViewWidthConstraint, alertViewHeightConstraint])
             
         } else {
+            // AlertView - ContainerView
+            let alertViewRightSpaceConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Right, relatedBy: .Equal, toItem: self.containerView, attribute: .Right, multiplier: 1.0, constant: 0.0)
+            let alertViewLeftSpaceConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Left, relatedBy: .Equal, toItem: self.containerView, attribute: .Left, multiplier: 1.0, constant: 0.0)
+            let alertViewBottomSpaceConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Bottom, relatedBy: .Equal, toItem: self.containerView, attribute: .Bottom, multiplier: 1.0, constant: 15.0)
+            self.containerView.addConstraints([alertViewRightSpaceConstraint, alertViewLeftSpaceConstraint, alertViewBottomSpaceConstraint])
             
-            let alertViewCenterXConstraint = NSLayoutConstraint(item: self.alertView, attribute: .CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.containerView, attribute: .CenterX, multiplier: 1.0, constant: 0.0)
-            let alertViewBottomSpaceConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Bottom, relatedBy: NSLayoutRelation.Equal, toItem: self.containerView, attribute: .Bottom, multiplier: 1.0, constant: 15.0)
-            let alertViewWidthConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Width, relatedBy: NSLayoutRelation.Equal, toItem: self.containerView, attribute: .Width, multiplier: 1.0, constant: 0.0)
-            alertViewHeightConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 15.0)
-            self.containerView.addConstraints([alertViewCenterXConstraint, alertViewBottomSpaceConstraint, alertViewWidthConstraint, alertViewHeightConstraint])
+            // AlertView
+            alertViewHeightConstraint = NSLayoutConstraint(item: self.alertView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 1000.0)
+            self.alertView.addConstraint(alertViewHeightConstraint)
         }
         
-        // textAreaScrollView Layout Constraint
-        let textAreaScrollViewTopSpaceConstraint = NSLayoutConstraint(item: self.textAreaScrollView, attribute: .Top, relatedBy: NSLayoutRelation.Equal, toItem: self.alertView, attribute: .Top, multiplier: 1.0, constant: 0.0)
-        let textAreaScrollViewRightSpaceConstraint = NSLayoutConstraint(item: self.textAreaScrollView, attribute: .Right, relatedBy: NSLayoutRelation.Equal, toItem: self.alertView, attribute: .Right, multiplier: 1.0, constant: 0.0)
-        let textAreaScrollViewLeftSpaceConstraint = NSLayoutConstraint(item: self.textAreaScrollView, attribute: .Left, relatedBy: NSLayoutRelation.Equal, toItem: self.alertView, attribute: .Left, multiplier: 1.0, constant: 0.0)
-        let textAreaScrollViewBottomSpaceConstraint = NSLayoutConstraint(item: self.textAreaScrollView, attribute: .Bottom, relatedBy: NSLayoutRelation.Equal, toItem: self.buttonAreaScrollView, attribute: .Top, multiplier: 1.0, constant: 0.0)
+        // TextAreaScrollView - AlertView
+        let textAreaScrollViewTopSpaceConstraint = NSLayoutConstraint(item: self.textAreaScrollView, attribute: .Top, relatedBy: .Equal, toItem: self.alertView, attribute: .Top, multiplier: 1.0, constant: 0.0)
+        let textAreaScrollViewRightSpaceConstraint = NSLayoutConstraint(item: self.textAreaScrollView, attribute: .Right, relatedBy: .Equal, toItem: self.alertView, attribute: .Right, multiplier: 1.0, constant: 0.0)
+        let textAreaScrollViewLeftSpaceConstraint = NSLayoutConstraint(item: self.textAreaScrollView, attribute: .Left, relatedBy: .Equal, toItem: self.alertView, attribute: .Left, multiplier: 1.0, constant: 0.0)
+        let textAreaScrollViewBottomSpaceConstraint = NSLayoutConstraint(item: self.textAreaScrollView, attribute: .Bottom, relatedBy: .Equal, toItem: self.buttonAreaScrollView, attribute: .Top, multiplier: 1.0, constant: 0.0)
         self.alertView.addConstraints([textAreaScrollViewTopSpaceConstraint, textAreaScrollViewRightSpaceConstraint, textAreaScrollViewLeftSpaceConstraint, textAreaScrollViewBottomSpaceConstraint])
         
-        // buttonAreaScrollView Layout Constraint
-        let buttonAreaScrollViewRightSpaceConstraint = NSLayoutConstraint(item: self.buttonAreaScrollView, attribute: .Right, relatedBy: NSLayoutRelation.Equal, toItem: self.alertView, attribute: .Right, multiplier: 1.0, constant: 0.0)
-        let buttonAreaScrollViewLeftSpaceConstraint = NSLayoutConstraint(item: self.buttonAreaScrollView, attribute: .Left, relatedBy: NSLayoutRelation.Equal, toItem: self.alertView, attribute: .Left, multiplier: 1.0, constant: 0.0)
-        let buttonAreaScrollViewBottomSpaceConstraint = NSLayoutConstraint(item: self.buttonAreaScrollView, attribute: .Bottom, relatedBy: NSLayoutRelation.Equal, toItem: self.alertView, attribute: .Bottom, multiplier: 1.0, constant: isAlert() ? 0.0 : -15.0)
-        buttonAreaScrollViewHeightConstraint = NSLayoutConstraint(item: self.buttonAreaScrollView, attribute: .Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 0.0)
-        self.alertView.addConstraints([buttonAreaScrollViewRightSpaceConstraint, buttonAreaScrollViewLeftSpaceConstraint, buttonAreaScrollViewBottomSpaceConstraint, buttonAreaScrollViewHeightConstraint])
+        // TextAreaView - TextAreaScrollView
+        let textAreaViewTopSpaceConstraint = NSLayoutConstraint(item: self.textAreaView, attribute: .Top, relatedBy: .Equal, toItem: self.textAreaScrollView, attribute: .Top, multiplier: 1.0, constant: 0.0)
+        let textAreaViewRightSpaceConstraint = NSLayoutConstraint(item: self.textAreaView, attribute: .Right, relatedBy: .Equal, toItem: self.textAreaScrollView, attribute: .Right, multiplier: 1.0, constant: 0.0)
+        let textAreaViewLeftSpaceConstraint = NSLayoutConstraint(item: self.textAreaView, attribute: .Left, relatedBy: .Equal, toItem: self.textAreaScrollView, attribute: .Left, multiplier: 1.0, constant: 0.0)
+        let textAreaViewBottomSpaceConstraint = NSLayoutConstraint(item: self.textAreaView, attribute: .Bottom, relatedBy: .Equal, toItem: self.textAreaScrollView, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
+        let textAreaViewWidthConstraint = NSLayoutConstraint(item: self.textAreaView, attribute: .Width, relatedBy: .Equal, toItem: self.textAreaScrollView, attribute: .Width, multiplier: 1.0, constant: 0.0)
+        textAreaViewHeightConstraint = NSLayoutConstraint(item: self.textAreaView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 0.0)
+        self.textAreaScrollView.addConstraints([textAreaViewTopSpaceConstraint, textAreaViewRightSpaceConstraint, textAreaViewLeftSpaceConstraint, textAreaViewBottomSpaceConstraint, textAreaViewWidthConstraint, textAreaViewHeightConstraint])
+        
+        // TitleLabel - TextAreaView
+        let titleLabelCenterXConstraint = NSLayoutConstraint(item: self.titleLabel, attribute: .CenterX, relatedBy: .Equal, toItem: self.textAreaView, attribute: .CenterX, multiplier: 1.0, constant: 0.0)
+        let titleLabelTopSpaceConstraint = NSLayoutConstraint(item: self.titleLabel, attribute: .Top, relatedBy: .Equal, toItem: self.textAreaView, attribute: .Top, multiplier: 1.0, constant: 15.0)
+        self.textAreaView.addConstraints([titleLabelCenterXConstraint, titleLabelTopSpaceConstraint])
+        
+        // TitleLabel
+        let titleLabelWidthConstraint = NSLayoutConstraint(item: self.titleLabel, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .Width, multiplier: 1.0, constant: innerContentWidth)
+        titleLabelHeightConstraint = NSLayoutConstraint(item: self.titleLabel, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 0.0)
+        self.titleLabel.addConstraints([titleLabelWidthConstraint, titleLabelHeightConstraint])
+        
+        // MessageView - TextAreaView
+        let messageViewCenterXConstraint = NSLayoutConstraint(item: self.messageView, attribute: .CenterX, relatedBy: .Equal, toItem: self.textAreaView, attribute: .CenterX, multiplier: 1.0, constant: 0.0)
+        messageViewTopSpaceConstraint = NSLayoutConstraint(item: self.messageView, attribute: .Top, relatedBy: .Equal, toItem: self.titleLabel, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
+        self.textAreaView.addConstraints([messageViewCenterXConstraint, messageViewTopSpaceConstraint])
+        
+        // MessageView
+        let messageViewWidthConstraint = NSLayoutConstraint(item: self.messageView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .Width, multiplier: 1.0, constant: innerContentWidth)
+        messageViewHeightConstraint = NSLayoutConstraint(item: self.messageView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 0.0)
+        self.messageView.addConstraints([messageViewWidthConstraint, messageViewHeightConstraint])
+        
+        // TextFieldContainerView - TextAreaView
+        let textFieldContainerViewCenterXConstraint = NSLayoutConstraint(item: self.textFieldContainerView, attribute: .CenterX, relatedBy: .Equal, toItem: self.textAreaView, attribute: .CenterX, multiplier: 1.0, constant: 0.0)
+        textFieldContainerViewTopSpaceConstraint = NSLayoutConstraint(item: self.textFieldContainerView, attribute: .Top, relatedBy: .Equal, toItem: self.messageView, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
+        self.textAreaView.addConstraints([textFieldContainerViewCenterXConstraint, textFieldContainerViewTopSpaceConstraint])
+        
+        // TextFieldContainerView
+        let textFieldContainerViewWidthConstraint = NSLayoutConstraint(item: self.textFieldContainerView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .Width, multiplier: 1.0, constant: innerContentWidth)
+        textFieldContainerViewHeightConstraint = NSLayoutConstraint(item: self.textFieldContainerView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 0.0)
+        self.textFieldContainerView.addConstraints([textFieldContainerViewWidthConstraint, textFieldContainerViewHeightConstraint])
+        
+        // buttonAreaScrollView - AlertView
+        let buttonAreaScrollViewRightSpaceConstraint = NSLayoutConstraint(item: self.buttonAreaScrollView, attribute: .Right, relatedBy: .Equal, toItem: self.alertView, attribute: .Right, multiplier: 1.0, constant: 0.0)
+        let buttonAreaScrollViewLeftSpaceConstraint = NSLayoutConstraint(item: self.buttonAreaScrollView, attribute: .Left, relatedBy: .Equal, toItem: self.alertView, attribute: .Left, multiplier: 1.0, constant: 0.0)
+        let buttonAreaScrollViewBottomSpaceConstraint = NSLayoutConstraint(item: self.buttonAreaScrollView, attribute: .Bottom, relatedBy: .Equal, toItem: self.alertView, attribute: .Bottom, multiplier: 1.0, constant: isAlert() ? 0.0 : -15.0)
+        self.alertView.addConstraints([buttonAreaScrollViewRightSpaceConstraint, buttonAreaScrollViewLeftSpaceConstraint, buttonAreaScrollViewBottomSpaceConstraint])
+        
+        // buttonAreaScrollView
+        buttonAreaScrollViewHeightConstraint = NSLayoutConstraint(item: self.buttonAreaScrollView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1.0, constant: 0.0)
+        self.buttonAreaScrollView.addConstraint(buttonAreaScrollViewHeightConstraint)
 
         // NotificationCenter
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "handleAlertActionEnabledDidChangeNotification:", name: DOAlertActionEnabledDidChangeNotification, object: nil)
@@ -315,8 +414,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     func layoutView() {
         if (layoutFlg) { return }
         layoutFlg = true
-        println("layoutView")
-        
+
         //------------------------------
         // Color Settings
         //------------------------------
@@ -325,6 +423,14 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         titleLabel.textColor = titleTextColor
         messageView.backgroundColor = alertView.backgroundColor
         messageView.textColor = messageTextColor
+        
+        
+        alertView.backgroundColor = UIColor.brownColor()
+        textAreaScrollView.backgroundColor = UIColor.orangeColor()
+        textAreaView.backgroundColor = UIColor.purpleColor()
+        titleLabel.backgroundColor = UIColor.blueColor()
+        messageView.backgroundColor = UIColor.yellowColor()
+        textFieldContainerView.backgroundColor = UIColor.whiteColor()
         
         //------------------------------
         // Screen Size
@@ -362,48 +468,76 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         //------------------------------
         // TextArea Layout
         //------------------------------
-        var textAreaY: CGFloat = alertViewPadding
+        let haveTitle: Bool = title != nil && title != ""
+        let haveMessage: Bool = message != nil && message != ""
+        let haveTextField: Bool = textFields != nil && textFields!.count > 0
+        
+        var textAreaY: CGFloat = 15.0
         
         // TitleLabel
-        if (title != nil && title != "") {
-            titleLabel.frame.size = CGSize(width: innerContentWidth, height: 0.0)
+        titleLabel.frame.size = CGSize(width: innerContentWidth, height: 0.0)
+        if (haveTitle) {
             titleLabel.numberOfLines = 0
             titleLabel.textAlignment = .Center
             titleLabel.font = titleFont
             titleLabel.text = title
             titleLabel.sizeToFit()
             titleLabel.frame = CGRect(x: alertViewPadding, y: textAreaY, width: innerContentWidth, height: titleLabel.frame.height)
-            self.textAreaScrollView.addSubview(titleLabel)
+            
+            titleLabelHeightConstraint.constant = titleLabel.frame.height
+            messageViewTopSpaceConstraint.constant = 5.0
+            
             textAreaY += titleLabel.frame.height + 5.0
         }
         
         // MessageView
-        if (message != nil && message != "") {
-            messageView.frame.size = CGSize(width: innerContentWidth, height: 0.0)
+        messageView.frame.size = CGSize(width: innerContentWidth, height: 0.0)
+        if (haveMessage) {
             messageView.numberOfLines = 0
             messageView.textAlignment = .Center
             messageView.font = messageFont
             messageView.text = message
             messageView.sizeToFit()
             messageView.frame = CGRect(x: alertViewPadding, y: textAreaY, width: innerContentWidth, height: messageView.frame.height)
-            self.textAreaScrollView.addSubview(messageView)
+            
+            messageViewHeightConstraint.constant = messageView.frame.height
+            textFieldContainerViewTopSpaceConstraint.constant = 5.0
+            
             textAreaY += messageView.frame.height + 5.0
         }
         
+        // TextFieldContainerView
+        textFieldContainerView.frame.size = CGSize(width: innerContentWidth, height: 0.0)
+        
         // TextFields
-        if (self.textFields != nil && self.textFields!.count > 0) {
-            textAreaY += 10.0
+        if (haveTextField) {
+            
+            if (haveTitle && !haveMessage) {
+                messageViewTopSpaceConstraint.constant = 10.0
+                textAreaY += 5.0
+            } else if (haveMessage) {
+                textFieldContainerViewTopSpaceConstraint.constant = 10.0
+                textAreaY += 5.0
+            }
+            
             for (i, obj) in enumerate(self.textFields!) {
                 let textField = obj as! UITextField
-                textField.frame = CGRect(x: alertViewPadding, y: textAreaY, width: innerContentWidth, height: textFieldHeight)
+                textField.frame = CGRect(x: 0, y: textFieldHeight * CGFloat(i), width: innerContentWidth, height: textFieldHeight)
                 textAreaY += textFieldHeight
             }
             textAreaY += 5.0
+            
+            textFieldContainerViewHeightConstraint.constant = textFieldHeight * CGFloat(self.textFields!.count)
+        }
+        
+        if (!haveTitle && !haveMessage && !haveTextField) {
+            textAreaY = 0
         }
         
         // TextAreaScrollView
         self.textAreaHeight = textAreaY
         self.textAreaScrollView.contentSize = CGSize(width: alertViewWidth, height: textAreaHeight)
+        textAreaViewHeightConstraint.constant = textAreaY
         
         //------------------------------
         // ButtonArea Layout
@@ -585,7 +719,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             configurationHandler(textField)
         }
         self.textFields!.append(textField)
-        self.textAreaScrollView.addSubview(textField)
+        self.textFieldContainerView.addSubview(textField)
     }
     
     func isAlert() -> Bool { return preferredStyle == .Alert }
