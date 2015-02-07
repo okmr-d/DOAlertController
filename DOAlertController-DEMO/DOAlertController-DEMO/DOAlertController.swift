@@ -424,14 +424,6 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         messageView.backgroundColor = alertView.backgroundColor
         messageView.textColor = messageTextColor
         
-        
-        alertView.backgroundColor = UIColor.brownColor()
-        textAreaScrollView.backgroundColor = UIColor.orangeColor()
-        textAreaView.backgroundColor = UIColor.purpleColor()
-        titleLabel.backgroundColor = UIColor.blueColor()
-        messageView.backgroundColor = UIColor.yellowColor()
-        textFieldContainerView.backgroundColor = UIColor.whiteColor()
-        
         //------------------------------
         // Screen Size
         //------------------------------
