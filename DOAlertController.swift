@@ -80,26 +80,26 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
     }
     
     func presentAnimateTransition(transitionContext: UIViewControllerContextTransitioning) {
+        
         var alertController = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as! DOAlertController
-        var fromViewController = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey)!
         var containerView = transitionContext.containerView()
-        containerView.insertSubview(alertController.view, belowSubview: fromViewController.view)
         
         alertController.overlayView.alpha = 0.0
         if (alertController.isAlert()) {
-            alertController.containerView.alpha = 0.0
-            alertController.containerView.center = alertController.view.center
-            alertController.containerView.transform = CGAffineTransformMakeScale(0.5, 0.5)
+            alertController.alertView.alpha = 0.0
+            alertController.alertView.center = alertController.view.center
+            alertController.alertView.transform = CGAffineTransformMakeScale(0.5, 0.5)
         } else {
             alertController.containerView.transform = CGAffineTransformMakeTranslation(0, alertController.alertView.frame.height)
         }
+        containerView.addSubview(alertController.view)
         
         UIView.animateWithDuration(0.25,
             animations: {
                 alertController.overlayView.alpha = 1.0
                 if (alertController.isAlert()) {
-                    alertController.containerView.alpha = 1.0
-                    alertController.containerView.transform = CGAffineTransformMakeScale(1.05, 1.05)
+                    alertController.alertView.alpha = 1.0
+                    alertController.alertView.transform = CGAffineTransformMakeScale(1.05, 1.05)
                 } else {
                     alertController.containerView.transform = CGAffineTransformMakeTranslation(0, -15.0)
                 }
@@ -109,7 +109,7 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
                 UIView.animateWithDuration(0.2,
                     animations: {
                         if (alertController.isAlert()) {
-                            alertController.containerView.transform = CGAffineTransformIdentity
+                            alertController.alertView.transform = CGAffineTransformIdentity
                         } else {
                             alertController.containerView.transform = CGAffineTransformIdentity
                         }
@@ -131,8 +131,8 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
             animations: {
                 alertController.overlayView.alpha = 0.0
                 if (alertController.isAlert()) {
-                    alertController.containerView.alpha = 0.0
-                    alertController.containerView.transform = CGAffineTransformMakeScale(0.9, 0.9)
+                    alertController.alertView.alpha = 0.0
+                    alertController.alertView.transform = CGAffineTransformMakeScale(0.9, 0.9)
                 } else {
                     alertController.containerView.transform = CGAffineTransformMakeTranslation(0, alertController.alertView.frame.height)
                 }
@@ -433,7 +433,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         // Variable
         //------------------------------
         var alertViewPadding: CGFloat = 15.0
-        let textFieldHeight: CGFloat = 23.0
+        let textFieldHeight: CGFloat = 22.0
         let buttonHeight: CGFloat = 44.0
         var buttonMargin: CGFloat = 10.0
         
