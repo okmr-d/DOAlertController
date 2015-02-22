@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2Hh-cZ-dh5">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
     </dependencies>
     <scenes>
@@ -20,7 +21,7 @@
             </objects>
             <point key="canvasLocation" x="-441" y="265"/>
         </scene>
-        <!--Alert Controllers-->
+        <!--DOAlertController DEMO-->
         <scene sceneID="t6I-hE-aCQ">
             <objects>
                 <tableViewController id="Euf-i0-UPI" customClass="ViewController" customModule="DOAlertController_DEMO" customModuleProvider="target" sceneMemberID="viewController">
@@ -116,6 +117,23 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="HaU-fH-V6m" style="IBUITableViewCellStyleDefault" id="zRZ-nY-cos">
+                                        <rect key="frame" x="0.0" y="240" width="703" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="zRZ-nY-cos" id="7rV-bW-Jct">
+                                            <rect key="frame" x="0.0" y="0.0" width="703" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Custom" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="HaU-fH-V6m">
+                                                    <rect key="frame" x="15" y="0.0" width="673" height="43"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="Action Sheet Style" id="3ue-hf-6Lt">
@@ -154,6 +172,23 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Hjr-X8-bP0" style="IBUITableViewCellStyleDefault" id="0hZ-Uc-zBY">
+                                        <rect key="frame" x="0.0" y="108" width="703" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0hZ-Uc-zBY" id="lW0-hK-Hyc">
+                                            <rect key="frame" x="0.0" y="0.0" width="703" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Custom" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Hjr-X8-bP0" userLabel="Custom">
+                                                    <rect key="frame" x="15" y="0.0" width="673" height="43"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -162,7 +197,7 @@
                             <outlet property="delegate" destination="Euf-i0-UPI" id="MXX-aI-pip"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Alert Controllers" id="K1k-r2-fD1"/>
+                    <navigationItem key="navigationItem" title="DOAlertController DEMO" id="K1k-r2-fD1"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RKo-Wh-W19" userLabel="First Responder" sceneMemberID="firstResponder"/>
