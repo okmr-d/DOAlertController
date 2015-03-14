@@ -239,6 +239,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     
     private var layoutFlg = false
     private var keyboardHeight: CGFloat = 0.0
+    private var cancelButtonTag = 0
     
     // Initializer
     convenience init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
@@ -417,6 +418,15 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         layoutView()
     }
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if (!isAlert() && cancelButtonTag != 0) {
+            var tapGesture = UITapGestureRecognizer(target: self, action: "handleContainerViewTapGesture:")
+            containerView.addGestureRecognizer(tapGesture)
+        }
+    }
+    
     func layoutView() {
         if (layoutFlg) { return }
         layoutFlg = true
@@ -435,6 +445,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         let hasTextField: Bool = textFields != nil && textFields!.count > 0
         
         var textAreaPositionY: CGFloat = alertViewPadding
+        if (!isAlert()) {textAreaPositionY += alertViewPadding}
         
         // TitleLabel
         if (hasTitle) {
@@ -519,7 +530,6 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             }
             buttonAreaPositionY += buttonHeight
         } else {
-            var cancelButtonTag = 0
             for button in buttons {
                 let action = actions[button.tag - 1] as! DOAlertAction
                 if (action.style != DOAlertActionStyle.Cancel) {
@@ -607,6 +617,16 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     func buttonTapped(sender: UIButton) {
         sender.selected = true
         let action = actions[sender.tag - 1] as! DOAlertAction
+        if (action.handler != nil) {
+            action.handler(action)
+        }
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    // Handle ContainerView tap gesture
+    func handleContainerViewTapGesture(sender: AnyObject) {
+        // cancel action
+        let action = actions[cancelButtonTag] as! DOAlertAction
         if (action.handler != nil) {
             action.handler(action)
         }
