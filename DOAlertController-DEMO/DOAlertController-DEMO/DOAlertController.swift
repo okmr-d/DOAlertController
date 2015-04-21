@@ -68,6 +68,7 @@ class DOAlertController : UIViewController {
     
     // Buttons
     private var buttons = [UIButton]()
+    private var buttonHeight: CGFloat = 44.0
     var buttonFont = UIFont(name: "HelveticaNeue-Bold", size: 16)
     
     var buttonBgColor: [DOAlertActionStyle : UIColor] = [
@@ -238,7 +239,6 @@ class DOAlertController : UIViewController {
         }*/
         
         // Buttons
-        let buttonHeight: CGFloat = 44.0
         let buttonMargin: CGFloat = 10.0
         for btn in buttons {
             btn.frame = CGRect(x: alertViewPadding, y: y, width: innerContentWidth, height: buttonHeight)
