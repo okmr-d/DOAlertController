@@ -2,8 +2,8 @@
 //  DOAlertController.swift
 //  DOAlertController
 //
-//  Created by Daiki Okumura on 2014/12/30.
-//  Copyright (c) 2014 Daiki Okumura. All rights reserved.
+//  Created by Daiki Okumura on 2015/06/14.
+//  Copyright (c) 2015 Daiki Okumura. All rights reserved.
 //
 //  This software is released under the MIT License.
 //  http://opensource.org/licenses/mit-license.php
