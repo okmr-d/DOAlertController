@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "DOAlertController"
-  s.version      = "0.0.1"
+  s.version      = "1.0.0"
   s.summary      = "Simple Alert View written in Swift, which can be used as a UIAlertController replacement."
   s.homepage     = "https://github.com/okmr-d/DOAlertController"
   s.screenshots  = "https://raw.githubusercontent.com/okmr-d/okmr-d.github.io/master/img/DOAlertController/AlertScreenshot.png", "https://raw.githubusercontent.com/okmr-d/okmr-d.github.io/master/img/DOAlertController/ActionSheetScreenshot.png"
