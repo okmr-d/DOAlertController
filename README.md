@@ -3,7 +3,7 @@
 Simple Alert View written in Swift, which can be used as a UIAlertController replacement.  
 It supports from iOS7! It is simple and easily customizable!
 
-![BackgroundImage](https://raw.githubusercontent.com/okmr-d/okmr-d.github.io/master/img/DOAlertController/AlertScreenshot.png) ![BackgroundImage](https://raw.githubusercontent.com/okmr-d/okmr-d.github.io/master/img/DOAlertController/ActionSheetScreenshot.png)
+![BackgroundImage](https://raw.githubusercontent.com/okmr-d/okmr-d.github.io/master/img/DOAlertController/Alert.gif) ![BackgroundImage](https://raw.githubusercontent.com/okmr-d/okmr-d.github.io/master/img/DOAlertController/ActionSheet.gif)
 
 ## Easy to use
 DOAlertController can be used as a `UIAlertController`.
@@ -27,7 +27,7 @@ alertController.addAction(okAction)
 presentViewController(alertController, animated: true, completion: nil)
 ```
 
-## Easily Customizable
+## Customize
 
 * add TextField (Alert style only)
 * change Fonts
@@ -40,32 +40,37 @@ presentViewController(alertController, animated: true, completion: nil)
 ```swift
 alertController.addTextFieldWithConfigurationHandler { textField in
     // text field(UITextField) setting
-    // textField.placeholder = "Password"
-    // textField.secureTextEntry = true
+    // ex) textField.placeholder = "Password"
+    //     textField.secureTextEntry = true
 }
 ```
 
 #### Change Design
+##### Overlay color
 ```swift
-// overlay
 alertController.overlayColor = UIColor(red:235/255, green:245/255, blue:255/255, alpha:0.7)
-
-// alert view
+```
+##### Background color
+```swift
 alertController.alertViewBgColor = UIColor(red:44/255, green:62/255, blue:80/255, alpha:1)
-
-// title
+```
+##### Title (font, text color)
+```swift
 alertController.titleFont = UIFont(name: "GillSans-Bold", size: 18.0)
 alertController.titleTextColor = UIColor(red:241/255, green:196/255, blue:15/255, alpha:1)
-
-// message
+```
+##### Message (font, text color)
+```swift
 alertController.messageFont = UIFont(name: "GillSans-Italic", size: 15.0)
 alertController.messageTextColor = UIColor.whiteColor()
-
-// button (Default style)
+```
+##### Button (font, text color, background color(default/highlighted))
+```swift
 alertController.buttonFont[.Default] = UIFont(name: "GillSans-Bold", size: 16.0)
 alertController.buttonTextColor[.Default] = UIColor(red:44/255, green:62/255, blue:80/255, alpha:1)
 alertController.buttonBgColor[.Default] = UIColor(red: 46/255, green:204/255, blue:113/255, alpha:1)
 alertController.buttonBgColorHighlighted[.Default] = UIColor(red:64/255, green:212/255, blue:126/255, alpha:1)
+// Default style : [.Default]
 // Cancel style : [.Default] → [.Cancel]
 // Destructive style : [.Default] → [.Destructive]
 ```
