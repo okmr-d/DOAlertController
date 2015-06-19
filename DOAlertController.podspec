@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.author       = { "Daiki Okumura" => "daiki.okumura@gmail.com" }
   s.platform     = :ios, "8.0"
   s.source       = { :git => "https://github.com/okmr-d/DOAlertController.git", :tag => s.version.to_s }
-  s.source_files = "DOAlertController/*"
+  s.source_files = "DOAlertController/**/*.swift"
   s.framework    = "UIKit"
   s.requires_arc = true
 end
