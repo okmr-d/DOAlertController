@@ -47,7 +47,7 @@ class DOAlertAction : NSObject, NSCopying {
     }
     
     func copyWithZone(zone: NSZone) -> AnyObject {
-        let copy = self.dynamicType(title: title, style: style, handler: handler)
+        let copy = self.dynamicType.init(title: title, style: style, handler: handler)
         copy.enabled = self.enabled
         return copy
     }
@@ -63,7 +63,7 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
         self.isPresenting = isPresenting
     }
     
-    func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> NSTimeInterval {
+    func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
         if (isPresenting) {
             return 0.45
         } else {
@@ -81,8 +81,8 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
     
     func presentAnimateTransition(transitionContext: UIViewControllerContextTransitioning) {
         
-        var alertController = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as! DOAlertController
-        var containerView = transitionContext.containerView()
+        let alertController = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as! DOAlertController
+        let containerView = transitionContext.containerView()
         
         alertController.overlayView.alpha = 0.0
         if (alertController.isAlert()) {
@@ -92,7 +92,7 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
         } else {
             alertController.alertView.transform = CGAffineTransformMakeTranslation(0, alertController.alertView.frame.height)
         }
-        containerView.addSubview(alertController.view)
+        containerView!.addSubview(alertController.view)
         
         UIView.animateWithDuration(0.25,
             animations: {
@@ -120,7 +120,7 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
     
     func dismissAnimateTransition(transitionContext: UIViewControllerContextTransitioning) {
         
-        var alertController = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) as! DOAlertController
+        let alertController = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) as! DOAlertController
         
         UIView.animateWithDuration(self.transitionDuration(transitionContext),
             animations: {
@@ -311,15 +311,15 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         //------------------------------
         // Layout Constraint
         //------------------------------
-        overlayView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        containerView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        alertView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        textAreaScrollView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        textAreaView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        textContainer.setTranslatesAutoresizingMaskIntoConstraints(false)
-        buttonAreaScrollView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        buttonAreaView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        buttonContainer.setTranslatesAutoresizingMaskIntoConstraints(false)
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        alertView.translatesAutoresizingMaskIntoConstraints = false
+        textAreaScrollView.translatesAutoresizingMaskIntoConstraints = false
+        textAreaView.translatesAutoresizingMaskIntoConstraints = false
+        textContainer.translatesAutoresizingMaskIntoConstraints = false
+        buttonAreaScrollView.translatesAutoresizingMaskIntoConstraints = false
+        buttonAreaView.translatesAutoresizingMaskIntoConstraints = false
+        buttonContainer.translatesAutoresizingMaskIntoConstraints = false
         
         // self.view
         let overlayViewTopSpaceConstraint = NSLayoutConstraint(item: overlayView, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1.0, constant: 0.0)
@@ -409,7 +409,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         super.init(nibName:nibNameOrNil, bundle:nibBundleOrNil)
     }
     
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -422,7 +422,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         super.viewDidAppear(animated)
         
         if (!isAlert() && cancelButtonTag != 0) {
-            var tapGesture = UITapGestureRecognizer(target: self, action: "handleContainerViewTapGesture:")
+            let tapGesture = UITapGestureRecognizer(target: self, action: "handleContainerViewTapGesture:")
             containerView.addGestureRecognizer(tapGesture)
         }
     }
@@ -489,7 +489,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             var textFieldContainerHeight: CGFloat = 0.0
             
             // TextFields
-            for (i, obj) in enumerate(textFields!) {
+            for (_, obj) in (textFields!).enumerate() {
                 let textField = obj as! UITextField
                 textField.frame = CGRectMake(0.0, textFieldContainerHeight, innerContentWidth, textField.frame.height)
                 textFieldContainerHeight += textField.frame.height + 0.5
@@ -550,7 +550,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
                 if (!isAlert() && buttons.count > 1) {
                     buttonAreaPositionY += buttonMargin
                 }
-                var button = buttonAreaScrollView.viewWithTag(cancelButtonTag) as! UIButton
+                let button = buttonAreaScrollView.viewWithTag(cancelButtonTag) as! UIButton
                 let action = actions[cancelButtonTag - 1] as! DOAlertAction
                 button.titleLabel?.font = buttonFont[action.style]
                 button.setTitleColor(buttonTextColor[action.style], forState: .Normal)
@@ -586,7 +586,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         
         var screenSize = UIScreen.mainScreen().bounds.size
         if ((UIDevice.currentDevice().systemVersion as NSString).floatValue < 8.0) {
-            if (UIInterfaceOrientationIsLandscape(UIApplication.sharedApplication().statusBarOrientation)) {
+            if (UIInterfaceOrientationIsLandscape(currentOrientation())) {
                 screenSize = CGSizeMake(screenSize.height, screenSize.width)
             }
         }
@@ -634,10 +634,10 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     }
     
     // UIColor -> UIImage
-    func createImageFromUIColor(var color: UIColor) -> UIImage {
+    func createImageFromUIColor(color: UIColor) -> UIImage {
         let rect = CGRectMake(0, 0, 1, 1)
         UIGraphicsBeginImageContext(rect.size)
-        let contextRef: CGContextRef = UIGraphicsGetCurrentContext()
+        let contextRef: CGContextRef = UIGraphicsGetCurrentContext()!
         CGContextSetFillColorWithColor(contextRef, color.CGColor)
         CGContextFillRect(contextRef, rect)
         let img: UIImage = UIGraphicsGetImageFromCurrentImageContext()
@@ -687,7 +687,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         if (action.style == DOAlertActionStyle.Cancel) {
             for ac in actions as! [DOAlertAction] {
                 if (ac.style == DOAlertActionStyle.Cancel) {
-                    var error: NSError?
+                    let error: NSError? = nil
                     NSException.raise("NSInternalInconsistencyException", format:"DOAlertController can only have one action with a style of DOAlertActionStyleCancel", arguments:getVaList([error ?? "nil"]))
                     return
                 }
@@ -713,7 +713,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         
         // You can add a text field only if the preferredStyle property is set to DOAlertControllerStyle.Alert.
         if (!isAlert()) {
-            var error: NSError?
+            let error: NSError? = nil
             NSException.raise("NSInternalInconsistencyException", format: "Text fields can only be added to an alert controller of style DOAlertControllerStyleAlert", arguments:getVaList([error ?? "nil"]))
             return
         }
@@ -721,7 +721,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
             textFields = []
         }
         
-        var textField = UITextField()
+        let textField = UITextField()
         textField.frame.size = CGSizeMake(innerContentWidth, textFieldHeight)
         textField.borderStyle = UITextBorderStyle.None
         textField.backgroundColor = textFieldBgColor
