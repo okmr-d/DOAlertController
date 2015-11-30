@@ -264,7 +264,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         // Screen Size
         var screenSize = UIScreen.mainScreen().bounds.size
         if ((UIDevice.currentDevice().systemVersion as NSString).floatValue < 8.0) {
-            if (UIInterfaceOrientationIsLandscape(UIApplication.sharedApplication().statusBarOrientation)) {
+            if (UIInterfaceOrientationIsLandscape(currentOrientation())) {
                 screenSize = CGSizeMake(screenSize.height, screenSize.width)
             }
         }
@@ -412,7 +412,11 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+  
+    func currentOrientation() -> UIInterfaceOrientation {
+        return UIScreen.mainScreen().bounds.size.width < UIScreen.mainScreen().bounds.size.height ? .Portrait : .LandscapeLeft
+    }
+
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         layoutView()
@@ -586,7 +590,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         
         var screenSize = UIScreen.mainScreen().bounds.size
         if ((UIDevice.currentDevice().systemVersion as NSString).floatValue < 8.0) {
-            if (UIInterfaceOrientationIsLandscape(UIApplication.sharedApplication().statusBarOrientation)) {
+            if (UIInterfaceOrientationIsLandscape(currentOrientation())) {
                 screenSize = CGSizeMake(screenSize.height, screenSize.width)
             }
         }
@@ -657,7 +661,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         if let userInfo = notification.userInfo as? [String: NSValue] {
             var keyboardSize = userInfo[UIKeyboardFrameEndUserInfoKey]!.CGRectValue().size
             if ((UIDevice.currentDevice().systemVersion as NSString).floatValue < 8.0) {
-                if (UIInterfaceOrientationIsLandscape(UIApplication.sharedApplication().statusBarOrientation)) {
+                if (UIInterfaceOrientationIsLandscape(currentOrientation())) {
                     keyboardSize = CGSizeMake(keyboardSize.height, keyboardSize.width)
                 }
             }
