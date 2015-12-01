@@ -242,7 +242,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     private var cancelButtonTag = 0
     
     // Initializer
-    convenience init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
+    convenience public init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
         self.init(nibName: nil, bundle: nil)
         
         self.title = title
@@ -686,7 +686,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     // MARK: Public Methods
     
     // Attaches an action object to the alert or action sheet.
-    func addAction(action: DOAlertAction) {
+    public func addAction(action: DOAlertAction) {
         // Error
         if (action.style == DOAlertActionStyle.Cancel) {
             for ac in actions as! [DOAlertAction] {
@@ -713,7 +713,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     }
     
     // Adds a text field to an alert.
-    func addTextFieldWithConfigurationHandler(configurationHandler: ((UITextField!) -> Void)!) {
+    public func addTextFieldWithConfigurationHandler(configurationHandler: ((UITextField!) -> Void)!) {
         
         // You can add a text field only if the preferredStyle property is set to DOAlertControllerStyle.Alert.
         if (!isAlert()) {
@@ -739,7 +739,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
         textFieldContainerView.addSubview(textField)
     }
     
-    func isAlert() -> Bool { return preferredStyle == .Alert }
+    public func isAlert() -> Bool { return preferredStyle == .Alert }
     
     // MARK: UITextFieldDelegate Methods
     
