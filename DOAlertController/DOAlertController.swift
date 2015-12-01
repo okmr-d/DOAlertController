@@ -14,20 +14,20 @@ import UIKit
 
 let DOAlertActionEnabledDidChangeNotification = "DOAlertActionEnabledDidChangeNotification"
 
-enum DOAlertActionStyle : Int {
+public enum DOAlertActionStyle : Int {
     case Default
     case Cancel
     case Destructive
 }
 
-enum DOAlertControllerStyle : Int {
+public enum DOAlertControllerStyle : Int {
     case ActionSheet
     case Alert
 }
 
 // MARK: DOAlertAction Class
 
-class DOAlertAction : NSObject, NSCopying {
+public class DOAlertAction : NSObject, NSCopying {
     var title: String
     var style: DOAlertActionStyle
     var handler: ((DOAlertAction!) -> Void)!
@@ -39,14 +39,14 @@ class DOAlertAction : NSObject, NSCopying {
         }
     }
     
-    required init(title: String, style: DOAlertActionStyle, handler: ((DOAlertAction!) -> Void)!) {
+    required public init(title: String, style: DOAlertActionStyle, handler: ((DOAlertAction!) -> Void)!) {
         self.title = title
         self.style = style
         self.handler = handler
         self.enabled = true
     }
     
-    func copyWithZone(zone: NSZone) -> AnyObject {
+    public func copyWithZone(zone: NSZone) -> AnyObject {
         let copy = self.dynamicType.init(title: title, style: style, handler: handler)
         copy.enabled = self.enabled
         return copy
@@ -55,7 +55,7 @@ class DOAlertAction : NSObject, NSCopying {
 
 // MARK: DOAlertAnimation Class
 
-class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
+public class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
 
     let isPresenting: Bool
     
@@ -63,7 +63,7 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
         self.isPresenting = isPresenting
     }
     
-    func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
+    public func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
         if (isPresenting) {
             return 0.45
         } else {
@@ -71,7 +71,7 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
         }
     }
     
-    func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
+    public func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
         if (isPresenting) {
             self.presentAnimateTransition(transitionContext)
         } else {
@@ -140,7 +140,7 @@ class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning {
 
 // MARK: DOAlertController Class
 
-class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControllerTransitioningDelegate {
+public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControllerTransitioningDelegate {
     
     // Message
     var message: String?
@@ -409,7 +409,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         super.init(nibName:nibNameOrNil, bundle:nibBundleOrNil)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
   
@@ -417,12 +417,12 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
         return UIScreen.mainScreen().bounds.size.width < UIScreen.mainScreen().bounds.size.height ? .Portrait : .LandscapeLeft
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override public func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         layoutView()
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         
         if (!isAlert() && cancelButtonTag != 0) {
@@ -743,7 +743,7 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     
     // MARK: UITextFieldDelegate Methods
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    public func textFieldShouldReturn(textField: UITextField) -> Bool {
         if (textField.canResignFirstResponder()) {
             textField.resignFirstResponder()
             self.dismissViewControllerAnimated(true, completion: nil)
@@ -752,13 +752,13 @@ class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControlle
     }
     
     // MARK: UIViewControllerTransitioningDelegate Methods
-    
+  public   
     func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         layoutView()
         return DOAlertAnimation(isPresenting: true)
     }
     
-    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return DOAlertAnimation(isPresenting: false)
     }
 }
