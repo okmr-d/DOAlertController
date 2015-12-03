@@ -139,18 +139,18 @@ public class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning 
 }
 
 // MARK: DOAlertController Class
-
+@objc
 public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControllerTransitioningDelegate {
     
     // Message
-    var message: String?
+    public var message: String?
     
     // AlertController Style
     private(set) var preferredStyle: DOAlertControllerStyle?
     
     // OverlayView
     private var overlayView = UIView()
-    var overlayColor = UIColor(red:0, green:0, blue:0, alpha:0.5)
+    public var overlayColor = UIColor(red:0, green:0, blue:0, alpha:0.5)
     
     // ContainerView
     private var containerView = UIView()
@@ -158,7 +158,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     
     // AlertView
     private var alertView = UIView()
-    var alertViewBgColor = UIColor(red:239/255, green:240/255, blue:242/255, alpha:1.0)
+    public var alertViewBgColor = UIColor(red:239/255, green:240/255, blue:242/255, alpha:1.0)
     private var alertViewWidth: CGFloat = 270.0
     private var alertViewHeightConstraint: NSLayoutConstraint!
     private var alertViewPadding: CGFloat = 15.0
@@ -178,22 +178,22 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     
     // TitleLabel
     private var titleLabel = UILabel()
-    var titleFont = UIFont(name: "HelveticaNeue-Bold", size: 18)
-    var titleTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
+    public var titleFont = UIFont(name: "HelveticaNeue-Bold", size: 18)
+    public var titleTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
     // MessageView
     private var messageView = UILabel()
-    var messageFont = UIFont(name: "HelveticaNeue", size: 15)
-    var messageTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
+    public var messageFont = UIFont(name: "HelveticaNeue", size: 15)
+    public var messageTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
     // TextFieldContainerView
     private var textFieldContainerView = UIView()
-    var textFieldBorderColor = UIColor(red: 203.0/255, green: 203.0/255, blue: 203.0/255, alpha: 1.0)
+    public var textFieldBorderColor = UIColor(red: 203.0/255, green: 203.0/255, blue: 203.0/255, alpha: 1.0)
     
     // TextFields
     private(set) var textFields: [AnyObject]?
     private let textFieldHeight: CGFloat = 30.0
-    var textFieldBgColor = UIColor.whiteColor()
+    public var textFieldBgColor = UIColor.whiteColor()
     private let textFieldCornerRadius: CGFloat = 4.0
     
     // ButtonAreaScrollView
@@ -215,22 +215,22 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     
     // Buttons
     private var buttons = [UIButton]()
-    var buttonFont: [DOAlertActionStyle : UIFont!] = [
+    public var buttonFont: [DOAlertActionStyle : UIFont!] = [
         .Default : UIFont(name: "HelveticaNeue-Bold", size: 16),
         .Cancel  : UIFont(name: "HelveticaNeue-Bold", size: 16),
         .Destructive  : UIFont(name: "HelveticaNeue-Bold", size: 16)
     ]
-    var buttonTextColor: [DOAlertActionStyle : UIColor] = [
+    public var buttonTextColor: [DOAlertActionStyle : UIColor] = [
         .Default : UIColor.whiteColor(),
         .Cancel  : UIColor.whiteColor(),
         .Destructive  : UIColor.whiteColor()
     ]
-    var buttonBgColor: [DOAlertActionStyle : UIColor] = [
+    public var buttonBgColor: [DOAlertActionStyle : UIColor] = [
         .Default : UIColor(red:52/255, green:152/255, blue:219/255, alpha:1),
         .Cancel  : UIColor(red:127/255, green:140/255, blue:141/255, alpha:1),
         .Destructive  : UIColor(red:231/255, green:76/255, blue:60/255, alpha:1)
     ]
-    var buttonBgColorHighlighted: [DOAlertActionStyle : UIColor] = [
+    public var buttonBgColorHighlighted: [DOAlertActionStyle : UIColor] = [
         .Default : UIColor(red:74/255, green:163/255, blue:223/255, alpha:1),
         .Cancel  : UIColor(red:140/255, green:152/255, blue:153/255, alpha:1),
         .Destructive  : UIColor(red:234/255, green:97/255, blue:83/255, alpha:1)
