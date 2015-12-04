@@ -139,7 +139,7 @@ public class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning 
 }
 
 // MARK: DOAlertController Class
-@objc
+@objc(DOAlertController)
 public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewControllerTransitioningDelegate {
     
     // Message
