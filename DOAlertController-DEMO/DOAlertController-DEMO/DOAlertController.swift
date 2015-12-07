@@ -28,10 +28,10 @@ public enum DOAlertControllerStyle : Int {
 // MARK: DOAlertAction Class
 
 public class DOAlertAction : NSObject, NSCopying {
-    var title: String
-    var style: DOAlertActionStyle
+    public var title: String
+    public var style: DOAlertActionStyle
     var handler: ((DOAlertAction!) -> Void)!
-    var enabled: Bool {
+    public var enabled: Bool {
         didSet {
             if (oldValue != enabled) {
                 NSNotificationCenter.defaultCenter().postNotificationName(DOAlertActionEnabledDidChangeNotification, object: nil)
@@ -157,7 +157,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     private var containerViewBottomSpaceConstraint: NSLayoutConstraint!
     
     // AlertView
-    private var alertView = UIView()
+    public var alertView = UIView()
     public var alertViewBgColor = UIColor(red:239/255, green:240/255, blue:242/255, alpha:1.0)
     private var alertViewWidth: CGFloat = 270.0
     private var alertViewHeightConstraint: NSLayoutConstraint!
@@ -177,21 +177,21 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     private var textContainerHeightConstraint: NSLayoutConstraint!
     
     // TitleLabel
-    private var titleLabel = UILabel()
+    public var titleLabel = UILabel()
     public var titleFont = UIFont(name: "HelveticaNeue-Bold", size: 18)
     public var titleTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
     // MessageView
-    private var messageView = UILabel()
+    public var messageView = UILabel()
     public var messageFont = UIFont(name: "HelveticaNeue", size: 15)
     public var messageTextColor = UIColor(red:77/255, green:77/255, blue:77/255, alpha:1.0)
     
     // TextFieldContainerView
-    private var textFieldContainerView = UIView()
+    public var textFieldContainerView = UIView()
     public var textFieldBorderColor = UIColor(red: 203.0/255, green: 203.0/255, blue: 203.0/255, alpha: 1.0)
     
     // TextFields
-    private(set) var textFields: [AnyObject]?
+    private var textFields: [AnyObject]?
     private let textFieldHeight: CGFloat = 30.0
     public var textFieldBgColor = UIColor.whiteColor()
     private let textFieldCornerRadius: CGFloat = 4.0
@@ -211,10 +211,10 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     private var buttonMargin: CGFloat = 10.0
     
     // Actions
-    private(set) var actions: [AnyObject] = []
+    public private(set) var actions: [AnyObject] = []
     
     // Buttons
-    private var buttons = [UIButton]()
+    public var buttons = [UIButton]()
     public var buttonFont: [DOAlertActionStyle : UIFont!] = [
         .Default : UIFont(name: "HelveticaNeue-Bold", size: 16),
         .Cancel  : UIFont(name: "HelveticaNeue-Bold", size: 16),
@@ -242,7 +242,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     private var cancelButtonTag = 0
     
     // Initializer
-    convenience public init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
+    public convenience init(title: String?, message: String?, preferredStyle: DOAlertControllerStyle) {
         self.init(nibName: nil, bundle: nil)
         
         self.title = title
@@ -405,7 +405,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
         buttonContainer.addConstraints([buttonContainerWidthConstraint, buttonContainerHeightConstraint])
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+    override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
         super.init(nibName:nibNameOrNil, bundle:nibBundleOrNil)
     }
     
@@ -431,7 +431,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
         }
     }
     
-    func layoutView() {
+    public func layoutView() {
         if (layoutFlg) { return }
         layoutFlg = true
         
