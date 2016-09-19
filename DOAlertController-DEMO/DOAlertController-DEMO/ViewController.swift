@@ -166,7 +166,7 @@ class ViewController : UITableViewController, UITextFieldDelegate {
             // Listen for changes to the text field's text so that we can toggle the current
             // action's enabled property based on whether the user has entered a sufficiently
             // secure entry.
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: "handleTextFieldTextDidChangeNotification:", name: UITextFieldTextDidChangeNotification, object: textField)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewController.handleTextFieldTextDidChangeNotification(_:)), name: UITextFieldTextDidChangeNotification, object: textField)
             
             textField.secureTextEntry = true
         }

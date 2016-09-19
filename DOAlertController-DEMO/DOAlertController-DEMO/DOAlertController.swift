@@ -92,7 +92,7 @@ public class DOAlertAnimation : NSObject, UIViewControllerAnimatedTransitioning 
         } else {
             alertController.alertView.transform = CGAffineTransformMakeTranslation(0, alertController.alertView.frame.height)
         }
-        containerView!.addSubview(alertController.view)
+        containerView.addSubview(alertController.view)
         
         UIView.animateWithDuration(0.25,
             animations: {
@@ -191,7 +191,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     public var textFieldBorderColor = UIColor(red: 203.0/255, green: 203.0/255, blue: 203.0/255, alpha: 1.0)
     
     // TextFields
-    private var textFields: [AnyObject]?
+    private(set) var textFields: [AnyObject]?
     private let textFieldHeight: CGFloat = 30.0
     public var textFieldBgColor = UIColor.whiteColor()
     private let textFieldCornerRadius: CGFloat = 4.0
@@ -254,9 +254,9 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
         self.modalPresentationStyle = UIModalPresentationStyle.Custom
         
         // NotificationCenter
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "handleAlertActionEnabledDidChangeNotification:", name: DOAlertActionEnabledDidChangeNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "handleKeyboardWillShowNotification:", name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "handleKeyboardWillHideNotification:", name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DOAlertController.handleAlertActionEnabledDidChangeNotification(_:)), name: DOAlertActionEnabledDidChangeNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DOAlertController.handleKeyboardWillShowNotification(_:)), name: UIKeyboardWillShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DOAlertController.handleKeyboardWillHideNotification(_:)), name: UIKeyboardWillHideNotification, object: nil)
         
         // Delegate
         self.transitioningDelegate = self
@@ -282,7 +282,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
         super.viewDidAppear(animated)
         
         if (!isAlert() && cancelButtonTag != 0) {
-            let tapGesture = UITapGestureRecognizer(target: self, action: "handleContainerViewTapGesture:")
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(DOAlertController.handleContainerViewTapGesture(_:)))
             containerView.addGestureRecognizer(tapGesture)
         }
     }
@@ -649,7 +649,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
         let contextRef: CGContextRef = UIGraphicsGetCurrentContext()!
         CGContextSetFillColorWithColor(contextRef, color.CGColor)
         CGContextFillRect(contextRef, rect)
-        let img: UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        let img: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         return img
     }
@@ -711,7 +711,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
         button.setTitle(action.title, forState: .Normal)
         button.enabled = action.enabled
         button.layer.cornerRadius = buttonCornerRadius
-        button.addTarget(self, action: Selector("buttonTapped:"), forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(DOAlertController.buttonTapped(_:)), forControlEvents: .TouchUpInside)
         button.tag = buttons.count + 1
         buttons.append(button)
         buttonContainer.addSubview(button)
