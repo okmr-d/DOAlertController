@@ -635,7 +635,7 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
     // Handle ContainerView tap gesture
     func handleContainerViewTapGesture(sender: AnyObject) {
         // cancel action
-        let action = actions[cancelButtonTag] as! DOAlertAction
+        let action = actions[cancelButtonTag - 1] as! DOAlertAction
         if (action.handler != nil) {
             action.handler(action)
         }
