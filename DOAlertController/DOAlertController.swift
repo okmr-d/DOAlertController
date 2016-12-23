@@ -262,6 +262,10 @@ public class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCo
         self.transitioningDelegate = self
     }
     
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
+    
     override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
         super.init(nibName:nibNameOrNil, bundle:nibBundleOrNil)
     }
