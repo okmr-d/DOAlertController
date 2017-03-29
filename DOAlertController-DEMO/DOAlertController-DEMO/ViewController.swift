@@ -19,7 +19,7 @@ class ViewController : UITableViewController, UITextFieldDelegate {
     
     // A matrix of closures that should be invoked based on which table view cell is
     // tapped (index by section, row).
-    var actionMap: [[(selectedIndexPath: NSIndexPath) -> Void]] {
+    var actionMap: [[(_ selectedIndexPath: IndexPath) -> Void]] {
         return [
             // Alert style alerts.
             [
@@ -42,39 +42,39 @@ class ViewController : UITableViewController, UITextFieldDelegate {
     // MARK: DOAlertControllerStyleAlert Style Alerts
     
     /// Show an alert with an "Okay" button.
-    func showSimpleAlert(_: NSIndexPath) {
+    func showSimpleAlert(_: IndexPath) {
         let title = "Simple Alert"
         let message = "A message should be a short, complete sentence."
         let cancelButtonTitle = "OK"
         
-        let alertController = DOAlertController(title: title, message: message, preferredStyle: .Alert)
+        let alertController = DOAlertController(title: title, message: message, preferredStyle: .alert)
         
         // Create the action.
-        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .Cancel) { action in
+        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .cancel) { action in
             NSLog("The simple alert's cancel action occured.")
         }
         
         // Add the action.
         alertController.addAction(cancelAction)
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
     /// Show an alert with an "Okay" and "Cancel" button.
-    func showOkayCancelAlert(_: NSIndexPath) {
+    func showOkayCancelAlert(_: IndexPath) {
         let title = "Okay/Cancel Alert"
         let message = "A message should be a short, complete sentence."
         let cancelButtonTitle = "Cancel"
         let otherButtonTitle = "OK"
         
-        let alertCotroller = DOAlertController(title: title, message: message, preferredStyle: .Alert)
+        let alertCotroller = DOAlertController(title: title, message: message, preferredStyle: .alert)
         
         // Create the actions.
-        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .Cancel) { action in
+        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .cancel) { action in
             NSLog("The \"Okay/Cancel\" alert's cancel action occured.")
         }
         
-        let otherAction = DOAlertAction(title: otherButtonTitle, style: .Default) { action in
+        let otherAction = DOAlertAction(title: otherButtonTitle, style: .default) { action in
             NSLog("The \"Okay/Cancel\" alert's other action occured.")
         }
         
@@ -82,11 +82,11 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         alertCotroller.addAction(cancelAction)
         alertCotroller.addAction(otherAction)
         
-        presentViewController(alertCotroller, animated: true, completion: nil)
+        present(alertCotroller, animated: true, completion: nil)
     }
     
     /// Show an alert with two custom buttons.
-    func showOtherAlert(_: NSIndexPath) {
+    func showOtherAlert(_: IndexPath) {
         let title = "Other Alert"
         let message = "A message should be a short, complete sentence."
         let cancelButtonTitle = "Cancel"
@@ -94,22 +94,22 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         let otherButtonTitleTwo = "Choice Two"
         let destructiveButtonTitle = "Destructive"
         
-        let alertController = DOAlertController(title: title, message: message, preferredStyle: .Alert)
+        let alertController = DOAlertController(title: title, message: message, preferredStyle: .alert)
         
         // Create the actions.
-        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .Cancel) { action in
+        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .cancel) { action in
             NSLog("The \"Other\" alert's cancel action occured.")
         }
         
-        let otherButtonOneAction = DOAlertAction(title: otherButtonTitleOne, style: .Default) { action in
+        let otherButtonOneAction = DOAlertAction(title: otherButtonTitleOne, style: .default) { action in
             NSLog("The \"Other\" alert's other button one action occured.")
         }
         
-        let otherButtonTwoAction = DOAlertAction(title: otherButtonTitleTwo, style: .Default) { action in
+        let otherButtonTwoAction = DOAlertAction(title: otherButtonTitleTwo, style: .default) { action in
             NSLog("The \"Other\" alert's other button two action occured.")
         }
         
-        let destructiveButtonAction = DOAlertAction(title: destructiveButtonTitle, style: .Destructive) { action in
+        let destructiveButtonAction = DOAlertAction(title: destructiveButtonTitle, style: .destructive) { action in
             NSLog("The \"Other\" alert's destructive button action occured.")
         }
         
@@ -119,17 +119,17 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         alertController.addAction(otherButtonTwoAction)
         alertController.addAction(destructiveButtonAction)
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
     /// Show a text entry alert with two custom buttons.
-    func showTextEntryAlert(_: NSIndexPath) {
+    func showTextEntryAlert(_: IndexPath) {
         let title = "Text Entry Alert"
         let message = "A message should be a short, complete sentence."
         let cancelButtonTitle = "Cancel"
         let otherButtonTitle = "OK"
         
-        let alertController = DOAlertController(title: title, message: message, preferredStyle: .Alert)
+        let alertController = DOAlertController(title: title, message: message, preferredStyle: .alert)
         
         // Add the text field for text entry.
         alertController.addTextFieldWithConfigurationHandler { textField in
@@ -137,11 +137,11 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         }
         
         // Create the actions.
-        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .Cancel) { action in
+        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .cancel) { action in
             NSLog("The \"Text Entry\" alert's cancel action occured.")
         }
         
-        let otherAction = DOAlertAction(title: otherButtonTitle, style: .Default) { action in
+        let otherAction = DOAlertAction(title: otherButtonTitle, style: .default) { action in
             NSLog("The \"Text Entry\" alert's other action occured.")
         }
         
@@ -149,41 +149,41 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         alertController.addAction(cancelAction)
         alertController.addAction(otherAction)
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
     /// Show a secure text entry alert with two custom buttons.
-    func showSecureTextEntryAlert(_: NSIndexPath) {
+    func showSecureTextEntryAlert(_: IndexPath) {
         let title = "Secure Text Entry Alert"
         let message = "A message should be a short, complete sentence."
         let cancelButtonTitle = "Cancel"
         let otherButtonTitle = "OK"
         
-        let alertController = DOAlertController(title: title, message: message, preferredStyle: .Alert)
+        let alertController = DOAlertController(title: title, message: message, preferredStyle: .alert)
         
         // Add the text field for the secure text entry.
         alertController.addTextFieldWithConfigurationHandler { textField in
             // Listen for changes to the text field's text so that we can toggle the current
             // action's enabled property based on whether the user has entered a sufficiently
             // secure entry.
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewController.handleTextFieldTextDidChangeNotification(_:)), name: UITextFieldTextDidChangeNotification, object: textField)
+            NotificationCenter.default.addObserver(self, selector: #selector(ViewController.handleTextFieldTextDidChangeNotification(_:)), name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
             
-            textField.secureTextEntry = true
+            textField?.isSecureTextEntry = true
         }
         
         // Stop listening for text change notifications on the text field. This closure will be called in the two action handlers.
-        let removeTextFieldObserver: Void -> Void = {
-            NSNotificationCenter.defaultCenter().removeObserver(self, name: UITextFieldTextDidChangeNotification, object: alertController.textFields!.first)
+        let removeTextFieldObserver: (Void) -> Void = {
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UITextFieldTextDidChange, object: alertController.textFields!.first)
         }
         
         // Create the actions.
-        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .Cancel) { action in
+        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .cancel) { action in
             NSLog("The \"Secure Text Entry\" alert's cancel action occured.")
             
             removeTextFieldObserver()
         }
         
-        let otherAction = DOAlertAction(title: otherButtonTitle, style: .Default) { action in
+        let otherAction = DOAlertAction(title: otherButtonTitle, style: .default) { action in
             NSLog("The \"Secure Text Entry\" alert's other action occured.")
             
             removeTextFieldObserver()
@@ -199,17 +199,17 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         alertController.addAction(cancelAction)
         alertController.addAction(otherAction)
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
     /// Show a custom alert.
-    func showCustomAlert(_: NSIndexPath) {
+    func showCustomAlert(_: IndexPath) {
         let title = "LOGIN"
         let message = "Input your ID and Password"
         let cancelButtonTitle = "Cancel"
         let otherButtonTitle = "Login"
         
-        customAlertController = DOAlertController(title: title, message: message, preferredStyle: .Alert)
+        customAlertController = DOAlertController(title: title, message: message, preferredStyle: .alert)
         
         // OverlayView
         customAlertController.overlayColor = UIColor(red:235/255, green:245/255, blue:255/255, alpha:0.7)
@@ -220,63 +220,63 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         customAlertController.titleTextColor = UIColor(red:241/255, green:196/255, blue:15/255, alpha:1)
         // Message
         customAlertController.messageFont = UIFont(name: "GillSans-Italic", size: 15.0)
-        customAlertController.messageTextColor = UIColor.whiteColor()
+        customAlertController.messageTextColor = UIColor.white
         // Cancel Button
-        customAlertController.buttonFont[.Cancel] = UIFont(name: "GillSans-Bold", size: 16.0)
+        customAlertController.buttonFont[.cancel] = UIFont(name: "GillSans-Bold", size: 16.0)
         // Default Button
-        customAlertController.buttonFont[.Default] = UIFont(name: "GillSans-Bold", size: 16.0)
-        customAlertController.buttonTextColor[.Default] = UIColor(red:44/255, green:62/255, blue:80/255, alpha:1)
-        customAlertController.buttonBgColor[.Default] = UIColor(red: 46/255, green:204/255, blue:113/255, alpha:1)
-        customAlertController.buttonBgColorHighlighted[.Default] = UIColor(red:64/255, green:212/255, blue:126/255, alpha:1)
+        customAlertController.buttonFont[.default] = UIFont(name: "GillSans-Bold", size: 16.0)
+        customAlertController.buttonTextColor[.default] = UIColor(red:44/255, green:62/255, blue:80/255, alpha:1)
+        customAlertController.buttonBgColor[.default] = UIColor(red: 46/255, green:204/255, blue:113/255, alpha:1)
+        customAlertController.buttonBgColorHighlighted[.default] = UIColor(red:64/255, green:212/255, blue:126/255, alpha:1)
         
         
         customAlertController.addTextFieldWithConfigurationHandler { textField in
             self.textField1 = textField
-            textField.placeholder = "ID"
-            textField.frame.size = CGSizeMake(240.0, 30.0)
-            textField.font = UIFont(name: "HelveticaNeue", size: 15.0)
-            textField.keyboardAppearance = UIKeyboardAppearance.Dark
-            textField.returnKeyType = UIReturnKeyType.Next
+            textField?.placeholder = "ID"
+            textField?.frame.size = CGSize(width: 240.0, height: 30.0)
+            textField?.font = UIFont(name: "HelveticaNeue", size: 15.0)
+            textField?.keyboardAppearance = UIKeyboardAppearance.dark
+            textField?.returnKeyType = UIReturnKeyType.next
             
-            let label:UILabel = UILabel(frame: CGRectMake(0, 0, 50, 30))
+            let label:UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 30))
             label.text = "ID"
             label.font = UIFont(name: "GillSans-Bold", size: 15.0)
-            textField.leftView = label
-            textField.leftViewMode = UITextFieldViewMode.Always
+            textField?.leftView = label
+            textField?.leftViewMode = UITextFieldViewMode.always
             
-            textField.delegate = self
+            textField?.delegate = self
         }
         
         customAlertController.addTextFieldWithConfigurationHandler { textField in
             self.textField2 = textField
-            textField.secureTextEntry = true
-            textField.placeholder = "Password"
-            textField.frame.size = CGSizeMake(240.0, 30.0)
-            textField.font = UIFont(name: "HelveticaNeue", size: 15.0)
-            textField.keyboardAppearance = UIKeyboardAppearance.Dark
-            textField.returnKeyType = UIReturnKeyType.Send
+            textField?.isSecureTextEntry = true
+            textField?.placeholder = "Password"
+            textField?.frame.size = CGSize(width: 240.0, height: 30.0)
+            textField?.font = UIFont(name: "HelveticaNeue", size: 15.0)
+            textField?.keyboardAppearance = UIKeyboardAppearance.dark
+            textField?.returnKeyType = UIReturnKeyType.send
             
-            let label:UILabel = UILabel(frame: CGRectMake(0, 0, 50, 30))
+            let label:UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 30))
             label.text = "PASS"
             label.font = UIFont(name: "GillSans-Bold", size: 15.0)
-            textField.leftView = label
-            textField.leftViewMode = UITextFieldViewMode.Always
+            textField?.leftView = label
+            textField?.leftViewMode = UITextFieldViewMode.always
             
-            textField.delegate = self
+            textField?.delegate = self
         }
         
         // Create the actions.
-        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .Cancel) { action in
+        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .cancel) { action in
             NSLog("The \"Custom\" alert's cancel action occured.")
         }
         
-        let otherAction = DOAlertAction(title: otherButtonTitle, style: .Default) { action in
+        let otherAction = DOAlertAction(title: otherButtonTitle, style: .default) { action in
             NSLog("The \"Custom\" alert's other action occured.")
             
             let textFields = self.customAlertController.textFields as? Array<UITextField>
             if textFields != nil {
                 for textField: UITextField in textFields! {
-                    NSLog("  \(textField.placeholder!): \(textField.text)")
+                    NSLog("  \(textField.placeholder!): \(String(describing: textField.text))")
                 }
             }
         }
@@ -286,24 +286,24 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         customAlertController.addAction(cancelAction)
         customAlertController.addAction(otherAction)
         
-        presentViewController(customAlertController, animated: true, completion: nil)
+        present(customAlertController, animated: true, completion: nil)
     }
     
     // MARK: DOAlertControllerStyleActionSheet Style Alerts
     
     /// Show a dialog with an "Okay" and "Cancel" button.
-    func showOkayCancelActionSheet(selectedIndexPath: NSIndexPath) {
+    func showOkayCancelActionSheet(_ selectedIndexPath: IndexPath) {
         let cancelButtonTitle = "Cancel"
         let destructiveButtonTitle = "OK"
         
-        let alertController = DOAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+        let alertController = DOAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         // Create the actions.
-        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .Cancel) { action in
+        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .cancel) { action in
             NSLog("The \"Okay/Cancel\" alert action sheet's cancel action occured.")
         }
         
-        let destructiveAction = DOAlertAction(title: destructiveButtonTitle, style: .Destructive) { action in
+        let destructiveAction = DOAlertAction(title: destructiveButtonTitle, style: .destructive) { action in
             NSLog("The \"Okay/Cancel\" alert action sheet's destructive action occured.")
         }
         
@@ -311,24 +311,24 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         alertController.addAction(cancelAction)
         alertController.addAction(destructiveAction)
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
     /// Show a dialog with two custom buttons.
-    func showOtherActionSheet(selectedIndexPath: NSIndexPath) {
+    func showOtherActionSheet(_ selectedIndexPath: IndexPath) {
         let title = "Other ActionSheet"
         let message = "A message should be a short, complete sentence."
         let destructiveButtonTitle = "Destructive Choice"
         let otherButtonTitle = "Safe Choice"
         
-        let alertController = DOAlertController(title: title, message: message, preferredStyle: .ActionSheet)
+        let alertController = DOAlertController(title: title, message: message, preferredStyle: .actionSheet)
         
         // Create the actions.
-        let destructiveAction = DOAlertAction(title: destructiveButtonTitle, style: .Destructive) { action in
+        let destructiveAction = DOAlertAction(title: destructiveButtonTitle, style: .destructive) { action in
             NSLog("The \"Other\" alert action sheet's destructive action occured.")
         }
         
-        let otherAction = DOAlertAction(title: otherButtonTitle, style: .Default) { action in
+        let otherAction = DOAlertAction(title: otherButtonTitle, style: .default) { action in
             NSLog("The \"Other\" alert action sheet's other action occured.")
         }
         
@@ -336,18 +336,18 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         alertController.addAction(destructiveAction)
         alertController.addAction(otherAction)
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
     /// Show a custom dialog.
-    func showCustomActionSheet(selectedIndexPath: NSIndexPath) {
+    func showCustomActionSheet(_ selectedIndexPath: IndexPath) {
         let title = "A Short Title is Best"
         let message = "A message should be a short, complete sentence."
         let cancelButtonTitle = "Cancel"
         let otherButtonTitle = "Save"
         let destructiveButtonTitle = "Delete"
         
-        let alertController = DOAlertController(title: title, message: message, preferredStyle: .ActionSheet)
+        let alertController = DOAlertController(title: title, message: message, preferredStyle: .actionSheet)
         
         // OverlayView
         alertController.overlayColor = UIColor(red:235/255, green:245/255, blue:255/255, alpha:0.7)
@@ -358,26 +358,26 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         alertController.titleTextColor = UIColor(red:241/255, green:196/255, blue:15/255, alpha:1)
         // Message
         alertController.messageFont = UIFont(name: "GillSans-Italic", size: 15.0)
-        alertController.messageTextColor = UIColor.whiteColor()
+        alertController.messageTextColor = UIColor.white
         // Cancel Button
-        alertController.buttonFont[.Cancel] = UIFont(name: "GillSans-Bold", size: 16.0)
+        alertController.buttonFont[.cancel] = UIFont(name: "GillSans-Bold", size: 16.0)
         // Other Button
-        alertController.buttonFont[.Default] = UIFont(name: "GillSans-Bold", size: 16.0)
+        alertController.buttonFont[.default] = UIFont(name: "GillSans-Bold", size: 16.0)
         // Default Button
-        alertController.buttonFont[.Destructive] = UIFont(name: "GillSans-Bold", size: 16.0)
-        alertController.buttonBgColor[.Destructive] = UIColor(red: 192/255, green:57/255, blue:43/255, alpha:1)
-        alertController.buttonBgColorHighlighted[.Destructive] = UIColor(red:209/255, green:66/255, blue:51/255, alpha:1)
+        alertController.buttonFont[.destructive] = UIFont(name: "GillSans-Bold", size: 16.0)
+        alertController.buttonBgColor[.destructive] = UIColor(red: 192/255, green:57/255, blue:43/255, alpha:1)
+        alertController.buttonBgColorHighlighted[.destructive] = UIColor(red:209/255, green:66/255, blue:51/255, alpha:1)
         
         // Create the actions.
-        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .Cancel) { action in
+        let cancelAction = DOAlertAction(title: cancelButtonTitle, style: .cancel) { action in
             NSLog("The \"Custom\" alert action sheet's cancel action occured.")
         }
         
-        let otherAction = DOAlertAction(title: otherButtonTitle, style: .Default) { action in
+        let otherAction = DOAlertAction(title: otherButtonTitle, style: .default) { action in
             NSLog("The \"Custom\" alert action sheet's other action occured.")
         }
         
-        let destructiveAction = DOAlertAction(title: destructiveButtonTitle, style: .Destructive) { action in
+        let destructiveAction = DOAlertAction(title: destructiveButtonTitle, style: .destructive) { action in
             NSLog("The \"Custom\" alert action sheet's destructive action occured.")
         }
         
@@ -386,12 +386,12 @@ class ViewController : UITableViewController, UITextFieldDelegate {
         alertController.addAction(otherAction)
         alertController.addAction(destructiveAction)
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
     // MARK: UITextFieldTextDidChangeNotification
     
-    func handleTextFieldTextDidChangeNotification(notification: NSNotification) {
+    func handleTextFieldTextDidChangeNotification(_ notification: Notification) {
         let textField = notification.object as! UITextField
         
         // Enforce a minimum length of >= 5 characters for secure text alerts.
@@ -400,25 +400,25 @@ class ViewController : UITableViewController, UITextFieldDelegate {
     
     // MARK: UITextFieldDelegate Methods
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if (textField === textField1) {
             self.textField2?.becomeFirstResponder()
         } else if (textField === textField2) {
             customAlertAction!.handler(customAlertAction)
             self.textField2?.resignFirstResponder()
-            self.customAlertController.dismissViewControllerAnimated(true, completion: nil)
+            self.customAlertController.dismiss(animated: true, completion: nil)
         }
         return true
     }
     
     // MARK: UITableViewDelegate
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let action = actionMap[indexPath.section][indexPath.row]
         
-        action(selectedIndexPath: indexPath)
+        action(indexPath)
         
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
